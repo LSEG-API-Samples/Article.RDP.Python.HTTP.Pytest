@@ -1,0 +1,8 @@
+video/
+.env
+sample_jsons/
+test/__pycache__/
+test/.pytest_cache/
+rdp_controller/__pycache__/
+__pycache__/
+tree.txt
