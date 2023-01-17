@@ -1,6 +1,6 @@
 # Getting Start Unit Test with Pytest for an HTTP REST Python Application
-- version: 1.0
-- Last update: Jul 2022
+- version: Draft
+- Last update: Feb 2023
 - Environment: Windows
 - Prerequisite: [Access to RDP credentials](#prerequisite)
 
