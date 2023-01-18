@@ -47,13 +47,27 @@ def supply_test_mock_data():
     with open('./fixtures/rdp_test_esg_fixture.json', 'r') as file_input:
         valid_esg_json = json.loads(file_input.read())
 
+    token_expire_json = None
+    # Mock the RDP Auth Token Expire Response JSON
+    with open('./fixtures/rdp_test_token_expire_fixture.json', 'r') as file_input:
+        token_expire_json = json.loads(file_input.read())
+
     invalid_auth_json = {
         'error': 'invalid_client',
         'error_description':'Invalid Application Credential.'
+    }
+
+    invalid_esg_ric_json = {
+        'error': {
+            'code': 412,
+            'description': 'Unable to resolve all requested identifiers.'
+        }
     }
     
     return { 
         'valid_auth_json': valid_auth_json,
         'invalid_auth_json': invalid_auth_json,
-        'valid_esg_json': valid_esg_json
+        'valid_esg_json': valid_esg_json,
+        'token_expire_json': token_expire_json,
+        'invalid_esg_ric_json': invalid_esg_ric_json
         }

@@ -164,15 +164,85 @@ def test_request_esg(supply_test_config,supply_test_app, supply_test_mock_data, 
         headers = {'Content-Type':'application/json'}
         )
 
-    # Calling RDPHTTPController rdp_authentication() method
+    # Calling RDPHTTPController rdp_request_esg() method
     response = app.rdp_request_esg(
         esg_endpoint, supply_test_mock_data['valid_auth_json']['access_token'], 
         universe)
     # verifying basic response
-    assert type(response) is dict, "Invalid Data type returns"
+    assert type(response) is dict, 'Invalid Data type returns'
     assert 'data' in response
     assert 'headers' in response
     assert 'universe' in response
+
+def test_request_esg_token_expire(supply_test_config,supply_test_app, supply_test_mock_data, requests_mock):
+    """
+    Test that it can handle token expiration requests
+    """
+    esg_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_ESG_URL']
+    app = supply_test_app
+    universe = 'TEST.RIC'
+
+    requests_mock.get(
+        url= esg_endpoint, 
+        json = supply_test_mock_data['token_expire_json'], 
+        status_code = 401,
+        headers = {'Content-Type':'application/json'}
+        )
+    
+    # Calling RDPHTTPController rdp_request_esg() method
+    with pytest.raises(requests.exceptions.HTTPError) as excinfo:
+        response = app.rdp_request_esg(
+            esg_endpoint, supply_test_mock_data['valid_auth_json']['access_token'], 
+            universe)
+    # verifying basic response
+
+    print('Exception = ' + str(excinfo.value))
+    assert '401' in str(excinfo.value), 'Access Token Expire returns wrong HTTP Status Code'
+    assert 'Unauthorized' in str(excinfo.value), 'Access Token Expire returns wrong error message'
+
+    json_error = json.loads(str(excinfo.value).split('401 -')[1])
+    assert type(json_error) is dict, 'Access Token Expire returns wrong data type'
+    assert 'error' in json_error, 'Access Token Expire returns wrong JSON error response'
+    assert 'message' in json_error['error'], 'Access Token Expire returns wrong JSON error response'
+    assert 'status' in json_error['error'], 'Access Token Expire returns wrong JSON error response'
+
+def test_request_esg_invalid_ric(supply_test_config,supply_test_app, supply_test_mock_data, requests_mock):
+    """
+    Test that it can handle invalid RIC request
+    """
+    esg_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_ESG_URL']
+    app = supply_test_app
+    universe = 'INVALID.RIC'
+
+    requests_mock.get(
+        url= esg_endpoint, 
+        json = supply_test_mock_data['invalid_esg_ric_json'], 
+        status_code = 200,
+        headers = {'Content-Type':'application/json'}
+        )
+    
+    # Calling RDPHTTPController rdp_request_esg() method
+    response = app.rdp_request_esg(esg_endpoint, supply_test_mock_data['valid_auth_json']['access_token'], universe)
+
+    assert type(response) is dict, 'Invalid ESG request returns wrong data type'
+    assert 'error' in response, 'Invalid ESG request returns returns wrong JSON error response'
+    assert 'code' in response['error'], 'Invalid ESG request returns wrong JSON error response'
+    assert 'description' in response['error'], 'Invalid ESG request returns wrong JSON error response'
+
+def test_request_esg_none_empty(supply_test_app, supply_test_mock_data):
+    """
+    Test that the ESG function can handle none/empty input
+    """
+    esg_endpoint = None
+    app = supply_test_app
+    universe = ''
+
+    # Check if TypeError exception is raised
+    with pytest.raises(TypeError) as excinfo:
+        response = app.rdp_request_esg(esg_endpoint, supply_test_mock_data['valid_auth_json']['access_token'], universe)
+    
+    # Check if the exception message is correct
+    assert 'Received invalid (None or Empty) arguments' in str(excinfo.value),"Empty ESG request returns wrong Exception description"
 
 if __name__ == '__main__':
     test_login_rdp_success()
