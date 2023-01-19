@@ -88,6 +88,28 @@ The first step is to unzip or download the example project folder into a directo
     ``` bash
     (http_unittest) $>tests\pytest .
     ```
+### <a id="docker_example_run"></a>Run example test suite in Docker
+
+1. Start Docker
+2. Open a console, then go to the *project root* and run the following command to build a Docker image.
+    ```
+    $> docker build . -t python_pytest
+    ```
+3. Run a Docker container with the following command: 
+    ```
+    $> docker run -it --name python_pytest python_pytest
+    ```
+    You can pass pytest arguments too. The following example runs only test cases for the RDP Login API only.
+
+    ```
+    $> docker run -it --name python_pytest python_pytest -m test_login -v
+    ```
+4. To stop and delete a Docker container, press ``` Ctrl+C``` (or run ```docker stop python_pytest```) then run the following command:
+    ```
+    $> docker rm python_pytest
+    ```
+5. To delete a Docker image, run the ```docker rmi python_pytest``` after a container is removed.
+
 Example Result:
 ``` Bash
 (rdp_pytest) C:\rdp_python_pytest\test>pytest .

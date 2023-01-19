@@ -1,8 +1,13 @@
+images/
 video/
+.vscode/
 .env
 sample_jsons/
 tests/__pycache__/
 tests/.pytest_cache/
 rdp_controller/__pycache__/
 __pycache__/
-tree.txt
+README.md
+.git/
+.gitignore
+LICENSE.md
