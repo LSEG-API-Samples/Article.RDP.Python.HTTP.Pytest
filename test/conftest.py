@@ -16,24 +16,28 @@ import requests
 import json
 import os
 import sys
+
 sys.path.append('..')
 from dotenv import dotenv_values
 
 from rdp_controller import rdp_http_controller
 
-#app = rdp_http_controller.RDPHTTPController()
+# app = rdp_http_controller.RDPHTTPController()
 
-config = dotenv_values("../.env.test")
+config = dotenv_values('../.env.test')
+
 
 @pytest.fixture
 def supply_test_config():
-    #return { 'config': config, 'app': app}
+    # return { 'config': config, 'app': app}
     return config
+
 
 @pytest.fixture
 def supply_test_app():
     app = rdp_http_controller.RDPHTTPController()
     return app
+
 
 @pytest.fixture
 def supply_test_mock_data():
@@ -52,22 +56,51 @@ def supply_test_mock_data():
     with open('./fixtures/rdp_test_token_expire_fixture.json', 'r') as file_input:
         token_expire_json = json.loads(file_input.read())
 
+    valid_search_json = None
+    # Mock RDP Search Explore valid response JSON
+    with open('./fixtures/rdp_test_search_fixture.json', 'r') as file_input:
+        valid_search_json = json.loads(file_input.read())
+
     invalid_auth_json = {
         'error': 'invalid_client',
-        'error_description':'Invalid Application Credential.'
+        'error_description': 'Invalid Application Credential.',
     }
 
     invalid_esg_ric_json = {
         'error': {
             'code': 412,
-            'description': 'Unable to resolve all requested identifiers.'
+            'description': 'Unable to resolve all requested identifiers.',
         }
     }
-    
-    return { 
+
+    search_explore_payload = {
+        'View': 'Entities',
+        'Filter': '',
+        'Select': 'IssuerCommonName,DocumentTitle,RCSExchangeCountryLeaf,IssueISIN,ExchangeName,ExchangeCode,SearchAllCategoryv3,RCSTRBC2012Leaf',
+    }
+
+    invalid_explore_payload = {
+        'error': {
+            'id': '00000000-0000-0000-0000-000000000000',
+            'code': '400',
+            'message': 'Validation error',
+            'status': 'Bad Request',
+            'errors': [
+                {
+                    'key': 'json',
+                    'reason': 'json.View in body should be one of [CatalogItems Entities]',
+                }
+            ],
+        }
+    }
+
+    return {
         'valid_auth_json': valid_auth_json,
         'invalid_auth_json': invalid_auth_json,
         'valid_esg_json': valid_esg_json,
         'token_expire_json': token_expire_json,
-        'invalid_esg_ric_json': invalid_esg_ric_json
-        }
+        'invalid_esg_ric_json': invalid_esg_ric_json,
+        'valid_search_json': valid_search_json,
+        'search_explore_payload': search_explore_payload,
+        'invalid_explore_payload': invalid_explore_payload,
+    }
