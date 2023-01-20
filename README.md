@@ -119,6 +119,13 @@ The first step is to unzip or download the example project folder into a directo
     ```
 5. To delete a Docker image, run the ```docker rmi python_pytest``` after a container is removed.
 
+### Running as VS Code DevContainer
+
+1. Start a Docker desktop or Docker engine on your machine.
+2. Install the [VS Code - Remote Development extension pack](https://aka.ms/vscode-remote/download/extension).
+3. Open the VS Code Command Palette with the ```F1``` key, and then select the **Remote-Containers: Reopen in Container** command.
+4. Once this build is completed, VS Code automatically connects to the container, and automatics initializes the project for developers.  Now VS Code is ready for running and testing the Project inside this devcontainer.
+
 Example Result:
 ``` Bash
 (rdp_pytest) C:\rdp_python_pytest\test>pytest .
