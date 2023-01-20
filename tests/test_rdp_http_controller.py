@@ -13,17 +13,11 @@ ALL EXAMPLE CODE IS PROVIDED ON AN “AS IS” AND “AS AVAILABLE” BASIS FOR 
 import pytest
 import requests
 import json
-import os
-import sys
 
-
-def test_fixture(supply_test_config, supply_test_app):
-    assert supply_test_config['RDP_BASE_URL'] == 'https://api.refinitiv.com', 'RDP URL invalid'
-    assert supply_test_app.get_scope() == 'trapi', 'RDP Scope invalid'
 
 @pytest.mark.test_valid
 @pytest.mark.test_login
-def test_fixture_login(supply_test_config,supply_test_app, supply_test_mock_data, requests_mock):
+def test_fixture_login(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
     """
     Test that it can log in to the RDP Auth Service
     """
@@ -33,7 +27,7 @@ def test_fixture_login(supply_test_config,supply_test_app, supply_test_mock_data
     password = supply_test_config['RDP_PASSWORD']
     client_id = supply_test_config['RDP_CLIENTID']
 
-    app = supply_test_app
+    app = supply_test_class
 
     access_token = None
     refresh_token = None
@@ -54,7 +48,7 @@ def test_fixture_login(supply_test_config,supply_test_app, supply_test_mock_data
 
 @pytest.mark.test_valid
 @pytest.mark.test_login
-def test_login_rdp_refreshtoken(supply_test_config,supply_test_app, supply_test_mock_data, requests_mock):
+def test_login_rdp_refreshtoken(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
     """
     Test that it can handle token renewal using the refresh_token
     """
@@ -68,7 +62,7 @@ def test_login_rdp_refreshtoken(supply_test_config,supply_test_app, supply_test_
     refresh_token = supply_test_mock_data['valid_auth_json']['refresh_token']
     expires_in = 0
 
-    app = supply_test_app
+    app = supply_test_class
 
     requests_mock.post(
         url= auth_endpoint, 
@@ -84,12 +78,12 @@ def test_login_rdp_refreshtoken(supply_test_config,supply_test_app, supply_test_
     assert expires_in > 0
 
 @pytest.mark.test_login
-def test_login_rdp_invalid(supply_test_config,supply_test_app, supply_test_mock_data, requests_mock):
+def test_login_rdp_invalid(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
     """
     Test that it can handle some invalid credentials
     """
     auth_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_AUTH_URL']
-    app = supply_test_app
+    app = supply_test_class
 
     access_token = None
     refresh_token = None
@@ -126,12 +120,12 @@ def test_login_rdp_invalid(supply_test_config,supply_test_app, supply_test_mock_
 
 @pytest.mark.empty_case
 @pytest.mark.test_login
-def test_login_rdp_none_empty_params(supply_test_app):
+def test_login_rdp_none_empty_params(supply_test_class):
     """
     Test that the function can handle none/empty input
     """
 
-    app = supply_test_app
+    app = supply_test_class
 
     # Set None or Empty parameters
     auth_endpoint = None
@@ -155,13 +149,13 @@ def test_login_rdp_none_empty_params(supply_test_app):
 
 @pytest.mark.test_valid
 @pytest.mark.test_esg
-def test_request_esg(supply_test_config,supply_test_app, supply_test_mock_data, requests_mock):
+def test_request_esg(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
     """
     Test that it can request ESG Data
     """
     esg_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_ESG_URL']
 
-    app = supply_test_app
+    app = supply_test_class
 
     universe = 'TEST.RIC'
 
@@ -183,12 +177,12 @@ def test_request_esg(supply_test_config,supply_test_app, supply_test_mock_data, 
     assert 'universe' in response
 
 @pytest.mark.test_esg
-def test_request_esg_token_expire(supply_test_config,supply_test_app, supply_test_mock_data, requests_mock):
+def test_request_esg_token_expire(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
     """
     Test that it can handle token expiration requests
     """
     esg_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_ESG_URL']
-    app = supply_test_app
+    app = supply_test_class
     universe = 'TEST.RIC'
 
     requests_mock.get(
@@ -216,12 +210,12 @@ def test_request_esg_token_expire(supply_test_config,supply_test_app, supply_tes
     assert 'status' in json_error['error'], 'Access Token Expire returns wrong JSON error response'
 
 @pytest.mark.test_esg
-def test_request_esg_invalid_ric(supply_test_config,supply_test_app, supply_test_mock_data, requests_mock):
+def test_request_esg_invalid_ric(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
     """
     Test that it can handle invalid RIC request
     """
     esg_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_ESG_URL']
-    app = supply_test_app
+    app = supply_test_class
     universe = 'INVALID.RIC'
 
     requests_mock.get(
@@ -241,12 +235,12 @@ def test_request_esg_invalid_ric(supply_test_config,supply_test_app, supply_test
 
 @pytest.mark.empty_case
 @pytest.mark.test_esg
-def test_request_esg_none_empty(supply_test_app, supply_test_mock_data):
+def test_request_esg_none_empty(supply_test_class, supply_test_mock_data):
     """
     Test that the ESG function can handle none/empty input
     """
     esg_endpoint = None
-    app = supply_test_app
+    app = supply_test_class
     universe = ''
 
     # Check if TypeError exception is raised
@@ -258,12 +252,12 @@ def test_request_esg_none_empty(supply_test_app, supply_test_mock_data):
 
 @pytest.mark.test_valid
 @pytest.mark.test_search
-def test_request_search_explore(supply_test_config,supply_test_app, supply_test_mock_data, requests_mock):
+def test_request_search_explore(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
     """
     Test that it can get RIC's metadata via the RDP Search Explore Service
     """
     search_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_SEARCH_EXPLORE_URL']
-    app = supply_test_app
+    app = supply_test_class
     universe = 'TEST.RIC'
     payload = supply_test_mock_data['search_explore_payload']
     payload['Filter'] =f'RIC eq \'{universe}\''
@@ -283,12 +277,12 @@ def test_request_search_explore(supply_test_config,supply_test_app, supply_test_
     assert 'Hits' in response
 
 @pytest.mark.test_search
-def test_request_search_explore_token_expire(supply_test_config,supply_test_app, supply_test_mock_data, requests_mock):
+def test_request_search_explore_token_expire(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
     """
     Test that it can handle token expiration requests
     """
     search_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_SEARCH_EXPLORE_URL']
-    app = supply_test_app
+    app = supply_test_class
     universe = 'TEST.RIC'
     payload = supply_test_mock_data['search_explore_payload']
     payload['Filter'] =f'RIC eq \'{universe}\''
@@ -317,12 +311,12 @@ def test_request_search_explore_token_expire(supply_test_config,supply_test_app,
     assert 'status' in json_error['error'], 'Access Token Expire returns wrong JSON error response'
 
 @pytest.mark.test_search
-def test_request_search_explore_invalid_json(supply_test_config,supply_test_app, supply_test_mock_data, requests_mock):
+def test_request_search_explore_invalid_json(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
     """
     Test that it can handle invalid JSON request payload
     """
     search_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_SEARCH_EXPLORE_URL']
-    app = supply_test_app
+    app = supply_test_class
     payload = {'TestKey': 'InvalidValue'}
 
     requests_mock.post(
@@ -352,12 +346,12 @@ def test_request_search_explore_invalid_json(supply_test_config,supply_test_app,
 
 @pytest.mark.empty_case
 @pytest.mark.test_search
-def test_request_search_explore_none_empty(supply_test_app,supply_test_mock_data):
+def test_request_search_explore_none_empty(supply_test_class,supply_test_mock_data):
     """
     Test that the Search Explore function can handle none/empty input
     """
     search_endpoint = ''
-    app = supply_test_app
+    app = supply_test_class
     payload = {}
 
     # Check if TypeError exception is raised

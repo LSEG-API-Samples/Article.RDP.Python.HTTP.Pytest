@@ -21,6 +21,7 @@ sys.path.append('..')
 from dotenv import dotenv_values
 
 from rdp_controller import rdp_http_controller
+from app import convert_pandas
 
 # app = rdp_http_controller.RDPHTTPController()
 
@@ -34,10 +35,12 @@ def supply_test_config():
 
 
 @pytest.fixture
-def supply_test_app():
-    app = rdp_http_controller.RDPHTTPController()
-    return app
+def supply_test_class():
+    return rdp_http_controller.RDPHTTPController()
 
+@pytest.fixture
+def supply_test_app():
+    return convert_pandas
 
 @pytest.fixture
 def supply_test_mock_data():

@@ -86,26 +86,35 @@ The first step is to unzip or download the example project folder into a directo
     ```
 5. Once the dependencies installation process is success, Go to the project's *tests* folder, then run the following command to run the ```test_rdp_http_controller.py``` test suite.
     ``` bash
-    (http_unittest) $>tests\pytest .
+    (rdp_pytest) $>tests\pytest test_rdp_http_controller.py
+    ```
+    You can pass pytest arguments too. The following example runs only test cases for the RDP ESG service in verbose mode.
+
+    ``` bash
+   (rdp_pytest) $>tests\pytest -m test_esg -v
+    ```
+6. To run all test suites (```test_rdp_http_controller.py``` and ```test_app.py``` files), run the following command in the project's *tests* folder.
+    ``` bash
+    (rdp_pytest) $>tests\pytest .
     ```
 ### <a id="docker_example_run"></a>Run example test suite in Docker
 
 1. Start Docker
 2. Open a console, then go to the *project root* and run the following command to build a Docker image.
-    ```
+    ``` bash
     $> docker build . -t python_pytest
     ```
 3. Run a Docker container with the following command: 
-    ```
+    ``` bash
     $> docker run -it --name python_pytest python_pytest
     ```
-    You can pass pytest arguments too. The following example runs only test cases for the RDP Login API only.
+    You can pass pytest arguments too. The following example runs only test cases for the RDP Login API in a verbose mode.
 
-    ```
+    ``` bash
     $> docker run -it --name python_pytest python_pytest -m test_login -v
     ```
 4. To stop and delete a Docker container, press ``` Ctrl+C``` (or run ```docker stop python_pytest```) then run the following command:
-    ```
+    ``` bash
     $> docker rm python_pytest
     ```
 5. To delete a Docker image, run the ```docker rmi python_pytest``` after a container is removed.
@@ -117,11 +126,12 @@ Example Result:
 platform win32 -- Python 3.9.15, pytest-7.2.1, pluggy-1.0.0
 rootdir: C:\rdp_python_pytest\test    
 plugins: requests-mock-1.10.0
-collected 6 items
+collected 15 items
 
-test_rdp_http_controller.py ......                                                                            [100%]
+test_app.py ...                                                                                               [ 20%]
+test_rdp_http_controller.py ............                                                                      [100%]
 
-================================================ 6 passed in 0.08s =================================================
+================================================ 15 passed in 0.17s =================================================
 ```
 
 ## <a id="references"></a>References
