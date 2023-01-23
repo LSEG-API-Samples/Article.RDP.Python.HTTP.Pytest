@@ -16,12 +16,13 @@ import json
 import pandas as pd
 
 @pytest.mark.test_app
-def test_can_convert_json_to_pandas(supply_test_app, supply_test_mock_esg_data):
+def test_can_convert_json_to_pandas(supply_test_app, shared_datadir ):
     """
     Test that the convert_pandas function can convert JSON to Pandas
     """
     # Mock RDP ESG View Score valid response JSON
-    mock_esg_data = supply_test_mock_esg_data['valid_esg_json']
+    contents = (shared_datadir / 'test_esg_fixture.json').read_text()
+    mock_esg_data = json.loads(contents)
 
     convert_pandas = supply_test_app
 
@@ -31,6 +32,7 @@ def test_can_convert_json_to_pandas(supply_test_app, supply_test_mock_esg_data):
     # Verify if result is none empty Pandas Dataframe object
     assert type(result) is pd.DataFrame, 'Main app convert_pandas() method return wrong data type'
     assert not result.empty, 'Main app convert_pandas() method return wrong data'
+
 
 @pytest.mark.test_app
 def test_can_covert_json_none(supply_test_app):
@@ -57,3 +59,6 @@ def test_can_convert_json_invalid(supply_test_app):
         result = convert_pandas({'message':'Invalid'})
     
     assert 'Error converting JSON to Dataframe' in str(excinfo.value),'Invalid JSON convert_pandas method call return wrong Exception description'
+
+if __name__ == '__main__':
+    print('This is the test_app.py test file')

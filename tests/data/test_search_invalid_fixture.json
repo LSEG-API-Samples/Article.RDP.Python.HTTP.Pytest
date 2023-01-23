@@ -1,0 +1,14 @@
+{
+    "error": {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "code": "400",
+        "message": "Validation error",
+        "status": "Bad Request",
+        "errors": [
+            {
+                "key": "json",
+                "reason": "json.View in body should be one of [CatalogItems Entities]"
+            }
+        ]
+    }
+}

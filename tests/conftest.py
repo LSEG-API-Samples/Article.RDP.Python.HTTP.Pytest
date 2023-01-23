@@ -38,52 +38,30 @@ def supply_test_app():
     return convert_pandas
 
 @pytest.fixture
-def supply_test_mock_auth_data():
-    valid_auth_json = None
-    # Loading Mock the RDP Auth Token success Response JSON
-    with open('./data/rdp_test_auth_fixture.json', 'r') as file_input:
-        valid_auth_json = json.loads(file_input.read())
+def supply_test_mock_json():
+    #  Mock the RDP Auth Token success Response JSON
+    valid_auth_json = {
+        'access_token': 'access_token_mock1mock2mock3mock4mock5',
+        'refresh_token': 'refresh_token_mock1mock2mock3mock4mock5',
+        'expires_in': '600',
+        'scope': 'test1 test2 test3 test4 test5',
+        'token_type': 'Bearer'
+    }
 
-    token_expire_json = None
     # Mock the RDP Auth Token Expire Response JSON
-    with open('./data/rdp_test_token_expire_fixture.json', 'r') as file_input:
-        token_expire_json = json.loads(file_input.read())
+    token_expire_json = {
+        'error': {
+            'id': 'XXXXXXXXXX',
+            'code': '401',
+            'message': 'token expired',
+            'status': 'Unauthorized'
+        }
+    }
 
     invalid_auth_json = {
         'error': 'invalid_client',
         'error_description': 'Invalid Application Credential.',
     }
-
-    return {
-        'valid_auth_json': valid_auth_json,
-        'invalid_auth_json': invalid_auth_json,
-        'token_expire_json': token_expire_json
-    }
-
-@pytest.fixture()
-def supply_test_mock_esg_data():
-    valid_esg_json = None
-    # Loading Mock RDP ESG View Score valid response JSON
-    with open('./data/rdp_test_esg_fixture.json', 'r') as file_input:
-        valid_esg_json = json.loads(file_input.read())
-    
-    invalid_esg_ric_json = {
-        'error': {
-            'code': 412,
-            'description': 'Unable to resolve all requested identifiers.',
-        }
-    }
-    return { 
-        'valid_esg_json': valid_esg_json,
-        'invalid_esg_ric_json': invalid_esg_ric_json
-    }
-
-@pytest.fixture()
-def supply_test_mock_search_data():
-    valid_search_json = None
-    # Mock RDP Search Explore valid response JSON
-    with open('./data/rdp_test_search_fixture.json', 'r') as file_input:
-        valid_search_json = json.loads(file_input.read())
 
     search_explore_payload = {
         'View': 'Entities',
@@ -91,23 +69,11 @@ def supply_test_mock_search_data():
         'Select': 'IssuerCommonName,DocumentTitle,RCSExchangeCountryLeaf,IssueISIN,ExchangeName,ExchangeCode,SearchAllCategoryv3,RCSTRBC2012Leaf',
     }
 
-    invalid_explore_payload = {
-        'error': {
-            'id': '00000000-0000-0000-0000-000000000000',
-            'code': '400',
-            'message': 'Validation error',
-            'status': 'Bad Request',
-            'errors': [
-                {
-                    'key': 'json',
-                    'reason': 'json.View in body should be one of [CatalogItems Entities]',
-                }
-            ],
-        }
-    }
 
     return {
-        'valid_search_json': valid_search_json,
-        'search_explore_payload': search_explore_payload,
-        'invalid_explore_payload': invalid_explore_payload,
-    }  
+        'valid_auth_json': valid_auth_json,
+        'invalid_auth_json': invalid_auth_json,
+        'token_expire_json': token_expire_json,
+        'search_explore_payload': search_explore_payload
+    }
+
