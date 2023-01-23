@@ -46,22 +46,22 @@ def supply_test_app():
 def supply_test_mock_data():
     valid_auth_json = None
     # Loading Mock the RDP Auth Token success Response JSON
-    with open('./fixtures/rdp_test_auth_fixture.json', 'r') as file_input:
+    with open('./tests_fixtures/rdp_test_auth_fixture.json', 'r') as file_input:
         valid_auth_json = json.loads(file_input.read())
 
     valid_esg_json = None
     # Loading Mock RDP ESG View Score valid response JSON
-    with open('./fixtures/rdp_test_esg_fixture.json', 'r') as file_input:
+    with open('./tests_fixtures/rdp_test_esg_fixture.json', 'r') as file_input:
         valid_esg_json = json.loads(file_input.read())
 
     token_expire_json = None
     # Mock the RDP Auth Token Expire Response JSON
-    with open('./fixtures/rdp_test_token_expire_fixture.json', 'r') as file_input:
+    with open('./tests_fixtures/rdp_test_token_expire_fixture.json', 'r') as file_input:
         token_expire_json = json.loads(file_input.read())
 
     valid_search_json = None
     # Mock RDP Search Explore valid response JSON
-    with open('./fixtures/rdp_test_search_fixture.json', 'r') as file_input:
+    with open('./tests_fixtures/rdp_test_search_fixture.json', 'r') as file_input:
         valid_search_json = json.loads(file_input.read())
 
     invalid_auth_json = {
@@ -107,3 +107,4 @@ def supply_test_mock_data():
         'search_explore_payload': search_explore_payload,
         'invalid_explore_payload': invalid_explore_payload,
     }
+
