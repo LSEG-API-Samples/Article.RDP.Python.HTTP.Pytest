@@ -7,7 +7,7 @@
 └── tests
     ├── __init__.py
     ├── conftest.py
-    ├── fixtures
+    ├── data
     │   ├── rdp_test_auth_fixture.json
     │   ├── rdp_test_esg_fixture.json
     │   ├── rdp_test_search_fixture.json
