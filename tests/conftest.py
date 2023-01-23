@@ -11,11 +11,10 @@ ALL EXAMPLE CODE IS PROVIDED ON AN “AS IS” AND “AS AVAILABLE” BASIS FOR 
 """
 
 import pytest
-
-import requests
 import json
-import os
 import sys
+import pathlib
+import os
 
 sys.path.append('..')
 from dotenv import dotenv_values
@@ -23,14 +22,10 @@ from dotenv import dotenv_values
 from rdp_controller import rdp_http_controller
 from app import convert_pandas
 
-# app = rdp_http_controller.RDPHTTPController()
-
 config = dotenv_values('../.env.test')
-
 
 @pytest.fixture
 def supply_test_config():
-    # return { 'config': config, 'app': app}
     return config
 
 
@@ -43,38 +38,52 @@ def supply_test_app():
     return convert_pandas
 
 @pytest.fixture
-def supply_test_mock_data():
+def supply_test_mock_auth_data():
     valid_auth_json = None
     # Loading Mock the RDP Auth Token success Response JSON
-    with open('./tests_fixtures/rdp_test_auth_fixture.json', 'r') as file_input:
+    with open('./data/rdp_test_auth_fixture.json', 'r') as file_input:
         valid_auth_json = json.loads(file_input.read())
-
-    valid_esg_json = None
-    # Loading Mock RDP ESG View Score valid response JSON
-    with open('./tests_fixtures/rdp_test_esg_fixture.json', 'r') as file_input:
-        valid_esg_json = json.loads(file_input.read())
 
     token_expire_json = None
     # Mock the RDP Auth Token Expire Response JSON
-    with open('./tests_fixtures/rdp_test_token_expire_fixture.json', 'r') as file_input:
+    with open('./data/rdp_test_token_expire_fixture.json', 'r') as file_input:
         token_expire_json = json.loads(file_input.read())
-
-    valid_search_json = None
-    # Mock RDP Search Explore valid response JSON
-    with open('./tests_fixtures/rdp_test_search_fixture.json', 'r') as file_input:
-        valid_search_json = json.loads(file_input.read())
 
     invalid_auth_json = {
         'error': 'invalid_client',
         'error_description': 'Invalid Application Credential.',
     }
 
+    return {
+        'valid_auth_json': valid_auth_json,
+        'invalid_auth_json': invalid_auth_json,
+        'token_expire_json': token_expire_json
+    }
+
+@pytest.fixture()
+def supply_test_mock_esg_data():
+    valid_esg_json = None
+    # Loading Mock RDP ESG View Score valid response JSON
+    with open('./data/rdp_test_esg_fixture.json', 'r') as file_input:
+        valid_esg_json = json.loads(file_input.read())
+    
     invalid_esg_ric_json = {
         'error': {
             'code': 412,
             'description': 'Unable to resolve all requested identifiers.',
         }
     }
+    return { 
+        'valid_esg_json': valid_esg_json,
+        'invalid_esg_ric_json': invalid_esg_ric_json
+    }
+
+@pytest.fixture()
+def supply_test_mock_search_data():
+    valid_search_json = None
+    # Mock RDP Search Explore valid response JSON
+    with open('./data/rdp_test_search_fixture.json', 'r') as file_input:
+        valid_search_json = json.loads(file_input.read())
 
     search_explore_payload = {
         'View': 'Entities',
@@ -98,13 +107,7 @@ def supply_test_mock_data():
     }
 
     return {
-        'valid_auth_json': valid_auth_json,
-        'invalid_auth_json': invalid_auth_json,
-        'valid_esg_json': valid_esg_json,
-        'token_expire_json': token_expire_json,
-        'invalid_esg_ric_json': invalid_esg_ric_json,
         'valid_search_json': valid_search_json,
         'search_explore_payload': search_explore_payload,
         'invalid_explore_payload': invalid_explore_payload,
-    }
-
+    }  

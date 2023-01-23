@@ -17,7 +17,7 @@ import json
 
 @pytest.mark.test_valid
 @pytest.mark.test_login
-def test_fixture_login(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
+def test_rdp_login(supply_test_config,supply_test_class, supply_test_mock_auth_data, requests_mock):
     """
     Test that it can log in to the RDP Auth Service
     """
@@ -35,7 +35,7 @@ def test_fixture_login(supply_test_config,supply_test_class, supply_test_mock_da
 
     requests_mock.post(
         url= auth_endpoint, 
-        json = supply_test_mock_data['valid_auth_json'], 
+        json = supply_test_mock_auth_data['valid_auth_json'], 
         status_code = 200,
         headers = {'Content-Type':'application/json'}
         )
@@ -48,7 +48,7 @@ def test_fixture_login(supply_test_config,supply_test_class, supply_test_mock_da
 
 @pytest.mark.test_valid
 @pytest.mark.test_login
-def test_login_rdp_refreshtoken(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
+def test_login_rdp_refreshtoken(supply_test_config,supply_test_class, supply_test_mock_auth_data, requests_mock):
     """
     Test that it can handle token renewal using the refresh_token
     """
@@ -59,14 +59,14 @@ def test_login_rdp_refreshtoken(supply_test_config,supply_test_class, supply_tes
 
     
     access_token = 'new_access_token_mock1mock2mock3mock4mock5mock6'
-    refresh_token = supply_test_mock_data['valid_auth_json']['refresh_token']
+    refresh_token = supply_test_mock_auth_data['valid_auth_json']['refresh_token']
     expires_in = 0
 
     app = supply_test_class
 
     requests_mock.post(
         url= auth_endpoint, 
-        json = supply_test_mock_data['valid_auth_json'], 
+        json = supply_test_mock_auth_data['valid_auth_json'], 
         status_code = 200,
         headers = {'Content-Type':'application/json'}
         )
@@ -78,7 +78,7 @@ def test_login_rdp_refreshtoken(supply_test_config,supply_test_class, supply_tes
     assert expires_in > 0
 
 @pytest.mark.test_login
-def test_login_rdp_invalid(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
+def test_login_rdp_invalid(supply_test_config,supply_test_class, supply_test_mock_auth_data, requests_mock):
     """
     Test that it can handle some invalid credentials
     """
@@ -91,7 +91,7 @@ def test_login_rdp_invalid(supply_test_config,supply_test_class, supply_test_moc
 
     requests_mock.post(
         url= auth_endpoint, 
-        json = supply_test_mock_data['invalid_auth_json'], 
+        json = supply_test_mock_auth_data['invalid_auth_json'], 
         status_code = 401,
         headers = {'Content-Type':'application/json'}
         )
@@ -106,8 +106,6 @@ def test_login_rdp_invalid(supply_test_config,supply_test_class, supply_test_moc
 
     with pytest.raises(requests.exceptions.HTTPError) as excinfo:
         access_token, refresh_token, expires_in = app.rdp_authentication(auth_endpoint, username, password, client_id)
-
-    #print('Exception: '+ excinfo.exconly(tryshort=True))
     
     assert access_token is None, "Invalid Login returns Access Token"
     assert refresh_token is None, "Invalid Login returns Refresh Token"
@@ -149,7 +147,7 @@ def test_login_rdp_none_empty_params(supply_test_class):
 
 @pytest.mark.test_valid
 @pytest.mark.test_esg
-def test_request_esg(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
+def test_request_esg(supply_test_config,supply_test_class, supply_test_mock_auth_data,supply_test_mock_esg_data, requests_mock):
     """
     Test that it can request ESG Data
     """
@@ -161,14 +159,14 @@ def test_request_esg(supply_test_config,supply_test_class, supply_test_mock_data
 
     requests_mock.get(
         url= esg_endpoint, 
-        json = supply_test_mock_data['valid_esg_json'], 
+        json = supply_test_mock_esg_data['valid_esg_json'], 
         status_code = 200,
         headers = {'Content-Type':'application/json'}
         )
 
     # Calling RDPHTTPController rdp_request_esg() method
     response = app.rdp_request_esg(
-        esg_endpoint, supply_test_mock_data['valid_auth_json']['access_token'], 
+        esg_endpoint, supply_test_mock_auth_data['valid_auth_json']['access_token'], 
         universe)
     # verifying basic response
     assert type(response) is dict, 'Invalid Data type returns'
@@ -177,7 +175,7 @@ def test_request_esg(supply_test_config,supply_test_class, supply_test_mock_data
     assert 'universe' in response
 
 @pytest.mark.test_esg
-def test_request_esg_token_expire(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
+def test_request_esg_token_expire(supply_test_config,supply_test_class, supply_test_mock_auth_data, requests_mock):
     """
     Test that it can handle token expiration requests
     """
@@ -187,7 +185,7 @@ def test_request_esg_token_expire(supply_test_config,supply_test_class, supply_t
 
     requests_mock.get(
         url= esg_endpoint, 
-        json = supply_test_mock_data['token_expire_json'], 
+        json = supply_test_mock_auth_data['token_expire_json'], 
         status_code = 401,
         headers = {'Content-Type':'application/json'}
         )
@@ -195,7 +193,7 @@ def test_request_esg_token_expire(supply_test_config,supply_test_class, supply_t
     # Calling RDPHTTPController rdp_request_esg() method
     with pytest.raises(requests.exceptions.HTTPError) as excinfo:
         response = app.rdp_request_esg(
-            esg_endpoint, supply_test_mock_data['valid_auth_json']['access_token'], 
+            esg_endpoint, supply_test_mock_auth_data['valid_auth_json']['access_token'], 
             universe)
     # verifying basic response
 
@@ -210,7 +208,7 @@ def test_request_esg_token_expire(supply_test_config,supply_test_class, supply_t
     assert 'status' in json_error['error'], 'Access Token Expire returns wrong JSON error response'
 
 @pytest.mark.test_esg
-def test_request_esg_invalid_ric(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
+def test_request_esg_invalid_ric(supply_test_config,supply_test_class, supply_test_mock_auth_data,supply_test_mock_esg_data, requests_mock):
     """
     Test that it can handle invalid RIC request
     """
@@ -220,13 +218,13 @@ def test_request_esg_invalid_ric(supply_test_config,supply_test_class, supply_te
 
     requests_mock.get(
         url= esg_endpoint, 
-        json = supply_test_mock_data['invalid_esg_ric_json'], 
+        json = supply_test_mock_esg_data['invalid_esg_ric_json'], 
         status_code = 200,
         headers = {'Content-Type':'application/json'}
         )
     
     # Calling RDPHTTPController rdp_request_esg() method
-    response = app.rdp_request_esg(esg_endpoint, supply_test_mock_data['valid_auth_json']['access_token'], universe)
+    response = app.rdp_request_esg(esg_endpoint, supply_test_mock_auth_data['valid_auth_json']['access_token'], universe)
 
     assert type(response) is dict, 'Invalid ESG request returns wrong data type'
     assert 'error' in response, 'Invalid ESG request returns returns wrong JSON error response'
@@ -235,7 +233,7 @@ def test_request_esg_invalid_ric(supply_test_config,supply_test_class, supply_te
 
 @pytest.mark.empty_case
 @pytest.mark.test_esg
-def test_request_esg_none_empty(supply_test_class, supply_test_mock_data):
+def test_request_esg_none_empty(supply_test_class, supply_test_mock_auth_data):
     """
     Test that the ESG function can handle none/empty input
     """
@@ -245,58 +243,58 @@ def test_request_esg_none_empty(supply_test_class, supply_test_mock_data):
 
     # Check if TypeError exception is raised
     with pytest.raises(TypeError) as excinfo:
-        response = app.rdp_request_esg(esg_endpoint, supply_test_mock_data['valid_auth_json']['access_token'], universe)
+        response = app.rdp_request_esg(esg_endpoint, supply_test_mock_auth_data['valid_auth_json']['access_token'], universe)
     
     # Check if the exception message is correct
     assert 'Received invalid (None or Empty) arguments' in str(excinfo.value),"Empty ESG request returns wrong Exception description"
 
 @pytest.mark.test_valid
 @pytest.mark.test_search
-def test_request_search_explore(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
+def test_request_search_explore(supply_test_config,supply_test_class, supply_test_mock_auth_data,supply_test_mock_search_data, requests_mock):
     """
     Test that it can get RIC's metadata via the RDP Search Explore Service
     """
     search_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_SEARCH_EXPLORE_URL']
     app = supply_test_class
     universe = 'TEST.RIC'
-    payload = supply_test_mock_data['search_explore_payload']
+    payload = supply_test_mock_search_data['search_explore_payload']
     payload['Filter'] =f'RIC eq \'{universe}\''
 
     requests_mock.post(
         url= search_endpoint, 
-        json = supply_test_mock_data['valid_search_json'], 
+        json = supply_test_mock_search_data['valid_search_json'], 
         status_code = 200,
         headers = {'Content-Type':'application/json'}
         )
     
     # Calling RDPHTTPController rdp_request_esg() method
-    response = app.rdp_request_search_explore(search_endpoint, supply_test_mock_data['valid_auth_json']['access_token'], payload)
+    response = app.rdp_request_search_explore(search_endpoint, supply_test_mock_auth_data['valid_auth_json']['access_token'], payload)
 
     assert type(response) is dict, 'Search request returns wrong data type'
     assert 'Total' in response
     assert 'Hits' in response
 
 @pytest.mark.test_search
-def test_request_search_explore_token_expire(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
+def test_request_search_explore_token_expire(supply_test_config,supply_test_class, supply_test_mock_auth_data,supply_test_mock_search_data, requests_mock):
     """
     Test that it can handle token expiration requests
     """
     search_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_SEARCH_EXPLORE_URL']
     app = supply_test_class
     universe = 'TEST.RIC'
-    payload = supply_test_mock_data['search_explore_payload']
+    payload = supply_test_mock_search_data['search_explore_payload']
     payload['Filter'] =f'RIC eq \'{universe}\''
 
     requests_mock.post(
         url= search_endpoint, 
-        json = supply_test_mock_data['token_expire_json'], 
+        json = supply_test_mock_auth_data['token_expire_json'], 
         status_code = 401,
         headers = {'Content-Type':'application/json'}
         )
     
     # Calling RDPHTTPController rdp_request_search_explore() method
     with pytest.raises(requests.exceptions.HTTPError) as excinfo:
-        response = app.rdp_request_search_explore(search_endpoint, supply_test_mock_data['valid_auth_json']['access_token'], payload)
+        response = app.rdp_request_search_explore(search_endpoint, supply_test_mock_auth_data['valid_auth_json']['access_token'], payload)
 
     # verifying basic response
 
@@ -311,7 +309,7 @@ def test_request_search_explore_token_expire(supply_test_config,supply_test_clas
     assert 'status' in json_error['error'], 'Access Token Expire returns wrong JSON error response'
 
 @pytest.mark.test_search
-def test_request_search_explore_invalid_json(supply_test_config,supply_test_class, supply_test_mock_data, requests_mock):
+def test_request_search_explore_invalid_json(supply_test_config,supply_test_class, supply_test_mock_auth_data,supply_test_mock_search_data, requests_mock):
     """
     Test that it can handle invalid JSON request payload
     """
@@ -321,14 +319,14 @@ def test_request_search_explore_invalid_json(supply_test_config,supply_test_clas
 
     requests_mock.post(
         url= search_endpoint, 
-        json = supply_test_mock_data['invalid_explore_payload'], 
+        json = supply_test_mock_search_data['invalid_explore_payload'], 
         status_code = 400,
         headers = {'Content-Type':'application/json'}
         )
     
     # Calling RDPHTTPController rdp_request_search_explore() method
     with pytest.raises(requests.exceptions.HTTPError) as excinfo:
-        response = app.rdp_request_search_explore(search_endpoint, supply_test_mock_data['valid_auth_json']['access_token'], payload)
+        response = app.rdp_request_search_explore(search_endpoint, supply_test_mock_auth_data['valid_auth_json']['access_token'], payload)
 
     # verifying basic response
 
@@ -346,7 +344,7 @@ def test_request_search_explore_invalid_json(supply_test_config,supply_test_clas
 
 @pytest.mark.empty_case
 @pytest.mark.test_search
-def test_request_search_explore_none_empty(supply_test_class,supply_test_mock_data):
+def test_request_search_explore_none_empty(supply_test_class,supply_test_mock_auth_data):
     """
     Test that the Search Explore function can handle none/empty input
     """
@@ -356,10 +354,10 @@ def test_request_search_explore_none_empty(supply_test_class,supply_test_mock_da
 
     # Check if TypeError exception is raised
     with pytest.raises(TypeError) as excinfo:
-        response = app.rdp_request_search_explore(search_endpoint, supply_test_mock_data['valid_auth_json']['access_token'], payload)
+        response = app.rdp_request_search_explore(search_endpoint, supply_test_mock_auth_data['valid_auth_json']['access_token'], payload)
     
     # Check if the exception message is correct
     assert 'Received invalid (None or Empty) arguments' in str(excinfo.value),"Empty Search explore request returns wrong Exception description"
 
 if __name__ == '__main__':
-    test_login_rdp_success()
+    print('This is a test file')

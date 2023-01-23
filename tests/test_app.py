@@ -16,12 +16,12 @@ import json
 import pandas as pd
 
 @pytest.mark.test_app
-def test_can_convert_json_to_pandas(supply_test_app, supply_test_mock_data):
+def test_can_convert_json_to_pandas(supply_test_app, supply_test_mock_esg_data):
     """
     Test that the convert_pandas function can convert JSON to Pandas
     """
     # Mock RDP ESG View Score valid response JSON
-    mock_esg_data = supply_test_mock_data['valid_esg_json']
+    mock_esg_data = supply_test_mock_esg_data['valid_esg_json']
 
     convert_pandas = supply_test_app
 

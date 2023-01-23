@@ -6,3 +6,4 @@ tests/.pytest_cache/
 rdp_controller/__pycache__/
 __pycache__/
 .vscode/
+note.txt
