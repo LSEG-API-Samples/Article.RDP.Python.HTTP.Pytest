@@ -80,9 +80,9 @@ The first step is to unzip or download the example project folder into a directo
     ``` bash
     (base) $>conda activate rdp_pytest
     ```
-4. Run the following command to the dependencies in the *rdp_pytest* environment 
+4. Run the following command to the test dependencies (```requirements_test.txt```) in the *rdp_pytest* environment 
     ``` bash
-    (rdp_pytest) $>pip install -r requirements.txt
+    (rdp_pytest) $>pip install -r requirements_test.txt
     ```
 5. Once the dependencies installation process is success, Go to the project's *tests* folder, then run the following command to run the ```test_rdp_http_controller.py``` test suite.
     ``` bash

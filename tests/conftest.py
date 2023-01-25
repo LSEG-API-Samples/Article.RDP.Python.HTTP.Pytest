@@ -11,9 +11,7 @@ ALL EXAMPLE CODE IS PROVIDED ON AN “AS IS” AND “AS AVAILABLE” BASIS FOR 
 """
 
 import pytest
-import json
 import sys
-import pathlib
 import os
 
 sys.path.append('..')
@@ -22,22 +20,24 @@ from dotenv import dotenv_values
 from rdp_controller import rdp_http_controller
 from app import convert_pandas
 
-config = dotenv_values('../.env.test')
-
-@pytest.fixture
+# Supply test environment variables
+@pytest.fixture(scope='class')
 def supply_test_config():
+    config = { **os.environ }
     return config
 
-
-@pytest.fixture
+# Supply test RDPHTTPController class
+@pytest.fixture(scope='class')
 def supply_test_class():
     return rdp_http_controller.RDPHTTPController()
 
-@pytest.fixture
+# Supply test main app.py
+@pytest.fixture(scope='class')
 def supply_test_app():
     return convert_pandas
 
-@pytest.fixture
+# Supply test static JSON mock messages
+@pytest.fixture(scope='class')
 def supply_test_mock_json():
     #  Mock the RDP Auth Token success Response JSON
     valid_auth_json = {

@@ -6,10 +6,10 @@ FROM python:${PYTHON_VERSION}-${VARIANT} AS builder
 LABEL maintainer="Developer Advocate"
 
 #Copy requirements.txt
-COPY requirements.txt .
+COPY requirements_test.txt .
 
-# install dependencies to the local user directory (eg. /root/.local)
-RUN pip install --user -r requirements.txt
+# install test dependencies to the local user directory (eg. /root/.local)
+RUN pip install --user -r requirements_test.txt
 
 # Run stage, using slim based-image because alpine cannot use Pandas and Matplotlib
 FROM python:${PYTHON_VERSION}-${VARIANT}  
