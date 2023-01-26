@@ -152,6 +152,7 @@ That brings me to the end of my unit test example project. For further details, 
 * [Getting Started with Refinitiv Data Platform](https://developers.refinitiv.com/en/article-catalog/article/getting-start-with-refinitiv-data-platform) article.
 * [Python pytest framework official page](https://docs.pytest.org/en/7.2.x/).
 * [Python requests-mock library page](https://requests-mock.readthedocs.io/en/latest/).
+* [Using pytest - Real Python](https://realpython.com/lessons/using-pytest/) website.
 
 
 For any questions related to Refinitiv Data Platform APIs, please use the [RDP APIs Forum](https://community.developers.refinitiv.com/spaces/231/index.html) on the [Developers Community Q&A page](https://community.developers.refinitiv.com/).
