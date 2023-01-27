@@ -17,11 +17,10 @@ import json
 
 @pytest.mark.test_valid
 @pytest.mark.test_login
-def test_rdp_login(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
+def test_login_rdp_success(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
     """
     Test that it can log in to the RDP Auth Service
     """
-    
     auth_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_AUTH_URL']
     username = supply_test_config['RDP_USERNAME']
     password = supply_test_config['RDP_PASSWORD']
@@ -42,9 +41,9 @@ def test_rdp_login(supply_test_config,supply_test_class, supply_test_mock_json, 
 
     # Calling RDPHTTPController rdp_authentication() method
     access_token, refresh_token, expires_in = app.rdp_authentication(auth_endpoint, username, password, client_id)
-    assert access_token is not None
-    assert refresh_token is not None
-    assert expires_in > 0
+    assert access_token is not None, "access token is None, success RDP Authentication returns invalid data"
+    assert refresh_token is not None, "refresh token is None, success RDP Authentication returns invalid data"
+    assert expires_in > 0, "expires_in is 0, success RDP Authentication returns invalid data"
 
 @pytest.mark.test_valid
 @pytest.mark.test_login
@@ -143,7 +142,7 @@ def test_login_rdp_none_empty_params(supply_test_class):
     assert refresh_token is None,"Empty Login returns Refresh Token"
     assert expires_in == 0, "Empty Login returns expires_in"
     # Check if the exception message is correct
-    assert 'Received invalid (None or Empty) arguments' in str(excinfo.value),"Empty Login returns wrong Exception description"
+    assert 'Received invalid (None or Empty) arguments' in str(excinfo.value),'Empty Login returns wrong Exception description'
 
 @pytest.mark.test_valid
 @pytest.mark.test_esg
@@ -374,7 +373,7 @@ def test_request_search_explore_none_empty(supply_test_class,supply_test_mock_js
         response = app.rdp_request_search_explore(search_endpoint, supply_test_mock_json['valid_auth_json']['access_token'], payload)
     
     # Check if the exception message is correct
-    assert 'Received invalid (None or Empty) arguments' in str(excinfo.value),"Empty Search explore request returns wrong Exception description"
+    assert 'Received invalid (None or Empty) arguments' in str(excinfo.value),'Empty Search explore request returns wrong Exception description'
 
 if __name__ == '__main__':
     print('This is the test_rdp_http_controller.py test file')

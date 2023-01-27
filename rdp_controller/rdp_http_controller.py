@@ -46,9 +46,9 @@ class RDPHTTPController():
                 data = payload, 
                 auth = (client_id, self.client_secret)
                 )
-        except Exception as exp:
+        except requests.exceptions.RequestException as exp:
             print(f'Caught exception: {exp}')
-    
+            return None, None, None
 
         if response.status_code == 200:  # HTTP Status 'OK'
             print('Authentication success')
@@ -59,7 +59,7 @@ class RDPHTTPController():
             print(f'RDP authentication failure: {response.status_code} {response.reason}')
             print(f'Text: {response.text}')
             raise requests.exceptions.HTTPError(f'RDP authentication failure: {response.status_code} - {response.text} ', response = response )
-        
+    
         return access_token, refresh_token, expires_in
     
     # Send HTTP Get request to the RDP ESG Service

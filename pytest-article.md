@@ -136,10 +136,11 @@ It loads the test configurations such as the RDP APIs URLs from a ```.env.test``
 
 Let's start with setting up the test configurations, resources and environment variables. This project keeps the test configurations such as mock RDP credentials, API URLs in a ```${project root}/.env.test``` environment variables file. And then uses the [pytest-dotenv](https://pypi.org/project/pytest-dotenv/) plugin it to the ```os.environ``` variable without hardcoded path reference to the file.
 
-To load a custom environment variables into pytest, we create a pytest configuration file named ```pytest.ini``` at the root of ```tests``` folder to specify where the ```env_var``` is.
+To load a custom environment variables into pytest, we create a pytest configuration file named ```pytest.ini``` at the root of ```tests``` folder to specify where the ```env_var``` is and overriding any variables already defined in the process' environment.
 
 ``` ini
 [pytest]
+env_override_existing_values = 1
 env_files = ../.env.test
 ```
 *Note*: This plugin uses the [python-dotenv](https://pypi.org/project/python-dotenv/) under the hood, so the python-dotenv dependency will be installed too.
@@ -214,9 +215,9 @@ class RDPHTTPController():
                 data = payload, 
                 auth = (client_id, self.client_secret)
                 )
-        except Exception as exp:
+        except requests.exceptions.RequestException as exp:
             print(f'Caught exception: {exp}')
-    
+            return None, None, None
 
         if response.status_code == 200:  # HTTP Status 'OK'
             print('Authentication success')
@@ -227,7 +228,7 @@ class RDPHTTPController():
             print(f'RDP authentication failure: {response.status_code} {response.reason}')
             print(f'Text: {response.text}')
             raise requests.exceptions.HTTPError(f'RDP authentication failure: {response.status_code} - {response.text} ', response = response )
-        
+    
         return access_token, refresh_token, expires_in
 ```
 
@@ -238,7 +239,7 @@ The ```rdp_authentication()``` method above just create the request message payl
 
 Let’s leave the ```rdp_authentication()``` method there and continue with the test case. The basic test case scenario is to check if the ```rdp_authentication()``` method can handle a valid RDP login and empty parameters scenarios. 
 
-The test class is ```tests\test_rdp_http_controller.py``` file (please noticed a *tests* prefixed). The basic test case code for the rdp_authentication() method is as follows:
+The test class is ```tests\test_rdp_http_controller.py``` file (please noticed a *tests* prefixed). The basic test case code for the ```rdp_authentication()``` method is as follows:
 
 ``` Python
 # test_rdp_http_controller.py
@@ -247,7 +248,7 @@ import pytest
 import requests
 import json
 
-def test_rdp_login(supply_test_config,supply_test_class):
+def test_login_rdp_success(supply_test_config,supply_test_class):
     """
     Test that it can log in to the RDP Auth Service
     """
@@ -265,7 +266,85 @@ def test_rdp_login(supply_test_config,supply_test_class):
 
     # Calling RDPHTTPController rdp_authentication() method
     access_token, refresh_token, expires_in = app.rdp_authentication(auth_endpoint, username, password, client_id)
-    assert access_token is not None
-    assert refresh_token is not None
-    assert expires_in > 0
+    assert access_token is not None, "access token is None, success RDP Authentication returns invalid data"
+    assert refresh_token is not None, "refresh token is None, success RDP Authentication returns invalid data"
+    assert expires_in > 0, "expires_in is 0, success RDP Authentication returns invalid data"
 ```
+
+The ```test_login_rdp_success()``` test case *requests* the ```supply_test_config``` and ```supply_test_class``` fixtures as function parameters. We get the RDPHTTPController object (as ```app``` function variable) and the RDP Auth URL endpoint string (as ```auth_endpoint``` function variable) from the *supply_test_config* and *supply_test_class* fixtures to use as the test case's resources. 
+
+The ```test_login_rdp_success()``` is a test case for the success RDP Authentication login scenario. It just sends the RDP Auth Service URL and RDP credentials to the ```RDPHTTPController.rdp_authentication()``` method and checks the response token information. Please noticed that a unit test just focuses on if the rdp_authentication() returns no empty/zero token information only. The token content validation would be in a system test (or later) phase.
+
+``` Python
+    assert access_token is not None, "access token is None, success RDP Authentication returns invalid data"
+    assert refresh_token is not None, "refresh token is None, success RDP Authentication returns invalid data"
+    assert expires_in > 0, "expires_in is 0, success RDP Authentication returns invalid data"
+```
+
+Please see more detail about the assertions in test on the [pytest framework](https://docs.pytest.org/en/7.1.x/how-to/assert.html page.
+
+What is about checking how the ```rpd_authentication()``` handles empty or none parameters? We create a new ```test_login_rdp_none_empty_params()``` test case to check if the method throws the TypeError exception and not return token information to a caller as expected. The code is shown below.
+
+``` Python
+# test_rdp_http_controller.py
+
+def test_login_rdp_none_empty_params(supply_test_class):
+    """
+    Test that the function can handle none/empty input
+    """
+
+    app = supply_test_class
+
+    # Set None or Empty parameters
+    auth_endpoint = None
+    username = ''
+    password = None
+    client_id = 'XXXXX'
+        
+    access_token = None
+    refresh_token = None
+    expires_in = 0
+
+    # Check if TypeError exception is raised
+    with pytest.raises(TypeError) as excinfo:
+        access_token, refresh_token, expires_in = app.rdp_authentication(auth_endpoint, username, password, client_id)
+    
+    assert access_token is None, "Empty Login returns Access Token"
+    assert refresh_token is None,"Empty Login returns Refresh Token"
+    assert expires_in == 0, "Empty Login returns expires_in"
+    # Check if the exception message is correct
+    assert 'Received invalid (None or Empty) arguments' in str(excinfo.value),"Empty Login returns wrong Exception description"
+```
+
+The ```test_login_rdp_none_empty_params()``` test case uses [pytest.raises()](https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest.raises) as a context manager to check if the called method throws expected exception type. If the code block does not raise the expected exception (```TypeError``` in the test above), or no exception at all, the check will fail instead.
+
+Please note that the ```pytest.raises()``` method returns the [ExceptionInfo](https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest.ExceptionInfo) object which can be used to inspect the details of the captured exception via ```.type```, ```.value``` and ```.traceback``` attributes. This behavior is a bit different from [unittest assertRaises()](https://docs.python.org/3/library/unittest.html#unittest.TestCase.assertRaises) that returns the context manage that store the caught exception *as is*.
+
+The example of a test runner result is shown below.
+
+``` Bash
+$>tests> pytest test_rdp_http_controller.py
+====================== test session starts =============================
+platform win32 -- Python 3.9.15, pytest-7.2.1, pluggy-1.0.0
+rootdir: $>tests>, configfile: pytest.ini
+plugins: dotenv-0.5.2
+collected 2 items
+
+test_rdp_http_controller.py ..                                            [100%] 
+
+====================== 2 passed in 0.05s =============================
+```
+
+However, the test suite above makes HTTP requests to RDP APIs in every run. It is not a good idea to flood requests to external services every time developers run a test suite when they have updated the code or configurations. 
+
+Unit test cases should be able to run independently without relying on external services or APIs. The external dependencies add uncontrolled factors (such as network connection, data reliability, etc) to unit test cases. Those components-to-components testing should be done in an integration testing phase. 
+
+So, how can we unit test HTTP request method calls without sending any HTTP request messages to an actual server? Fortunately, developers can simulate the HTTP request and response messages with *a mock object*.
+
+## <a id="unittest_mocking"></a>Mocking Python HTTP API call with Responses
+
+A mock is a fake object that is constructed to look and act like real data within a testing environment. We can simulate the various scenario of the real data with a mock object, then use a mock library to trick the system into thinking that that mock is the real one. 
+
+The purpose of mocking is to isolate and focus on the code being tested and not on the behavior or state of external dependencies. By mocking out external dependencies, developers can run tests as often without being affected by any unexpected changes or irregularities of those dependencies. Mocking also helps developers save time and computing resources if they have to test HTTP requests that fetch a lot of data.
+
+I have demonstrates how to use the [Responses](https://github.com/getsentry/responses)  in the [previous unittest framework project](https://github.com/Refinitiv-API-Samples/Article.RDP.Python.HTTP.UnitTest). I am using other popular Requests mocking library which is [requests-mock](https://requests-mock.readthedocs.io/en/latest/) with this pytest project.
