@@ -77,7 +77,7 @@ def test_login_rdp_refreshtoken(supply_test_config,supply_test_class, supply_tes
     assert expires_in > 0
 
 @pytest.mark.test_login
-def test_login_rdp_invalidClientID(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
+def test_login_rdp_invalid_clientID(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
     """
     Test that it can handle some invalid credentials
     """
@@ -106,11 +106,50 @@ def test_login_rdp_invalidClientID(supply_test_config,supply_test_class, supply_
     with pytest.raises(requests.exceptions.HTTPError) as excinfo:
         access_token, refresh_token, expires_in = app.rdp_authentication(auth_endpoint, username, password, client_id)
     
-    assert access_token is None, "Invalid Login returns Access Token"
-    assert refresh_token is None, "Invalid Login returns Refresh Token"
+    assert access_token is None, "Invalid clientID returns Access Token"
+    assert refresh_token is None, "Invalid clientID returns Refresh Token"
     assert expires_in == 0, "Invalid Login returns expires_in"
-    assert '401' in str(excinfo.value), "Invalid Login returns wrong HTTP Status Code"
+    assert '401' in str(excinfo.value), "Invalid clientID returns wrong HTTP Status Code"
     assert 'RDP authentication failure' in str(excinfo.value),"Invalid Login returns wrong Exception description"
+
+    json_error = json.loads(str(excinfo.value).split('-')[1])
+    assert type(json_error) is dict, "Invalid Login returns wrong Exception detail type"
+
+@pytest.mark.test_login
+def test_login_rdp_invalid_userpass(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
+    """
+    Test that it can handle some invalid credentials
+    """
+    auth_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_AUTH_URL']
+    app = supply_test_class
+
+    access_token = None
+    refresh_token = None
+    expires_in = 0
+
+    requests_mock.post(
+        url= auth_endpoint, 
+        json = supply_test_mock_json['invalid_userpass_auth_json'], 
+        status_code = 400,
+        headers = {'Content-Type':'application/json'}
+        )
+
+
+    username = 'wrong_user1'
+    password = 'wrong_password1'
+    client_id = supply_test_config['RDP_CLIENTID']
+    access_token = None
+    refresh_token = None
+    expires_in = 0
+
+    with pytest.raises(requests.exceptions.HTTPError) as excinfo:
+        access_token, refresh_token, expires_in = app.rdp_authentication(auth_endpoint, username, password, client_id)
+    
+    assert access_token is None, "Invalid User/Pass returns Access Token"
+    assert refresh_token is None, "Invalid User/Pas returns Refresh Token"
+    assert expires_in == 0, "Invalid User/Pas returns expires_in"
+    assert '400' in str(excinfo.value), "Invalid User/Pas returns wrong HTTP Status Code"
+    assert 'RDP authentication failure' in str(excinfo.value),"Invalid User/Pas returns wrong Exception description"
 
     json_error = json.loads(str(excinfo.value).split('-')[1])
     assert type(json_error) is dict, "Invalid Login returns wrong Exception detail type"
