@@ -77,7 +77,7 @@ def test_login_rdp_refreshtoken(supply_test_config,supply_test_class, supply_tes
     assert expires_in > 0
 
 @pytest.mark.test_login
-def test_login_rdp_invalid(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
+def test_login_rdp_invalidClientID(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
     """
     Test that it can handle some invalid credentials
     """
@@ -90,7 +90,7 @@ def test_login_rdp_invalid(supply_test_config,supply_test_class, supply_test_moc
 
     requests_mock.post(
         url= auth_endpoint, 
-        json = supply_test_mock_json['invalid_auth_json'], 
+        json = supply_test_mock_json['invalid_clientid_auth_json'], 
         status_code = 401,
         headers = {'Content-Type':'application/json'}
         )

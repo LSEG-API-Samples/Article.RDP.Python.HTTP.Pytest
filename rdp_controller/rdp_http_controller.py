@@ -72,8 +72,9 @@ class RDPHTTPController():
         # Request data for ESG Score Full Service
         try:
             response = requests.get(esg_url, headers={'Authorization': f'Bearer {access_token}'}, params = payload)
-        except Exception as exp:
+        except requests.exceptions.RequestException as exp:
             print(f'Caught exception: {exp}')
+            return None
 
         if response.status_code == 200:  # HTTP Status 'OK'
             print('Receive ESG Data from RDP APIs')
@@ -98,8 +99,9 @@ class RDPHTTPController():
 
         try:
             response = requests.post(search_url, headers = headers, data = json.dumps(payload))
-        except Exception as exp:
+        except requests.exceptions.RequestException as exp:
             print(f'Caught exception: {exp}')
+            return None
         
         if response.status_code == 200:  # HTTP Status 'OK'
             print('Receive Search Explore Data from RDP APIs')

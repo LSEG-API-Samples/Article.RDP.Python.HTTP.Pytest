@@ -58,10 +58,16 @@ def supply_test_mock_json():
         }
     }
 
-    invalid_auth_json = {
+    invalid_clientid_auth_json = {
         'error': 'invalid_client',
         'error_description': 'Invalid Application Credential.',
     }
+
+    invalid_userpass_auth_json = {
+        "error":"access_denied" ,
+        "error_description":"Invalid username or password."
+    }
+
 
     search_explore_payload = {
         'View': 'Entities',
@@ -72,7 +78,8 @@ def supply_test_mock_json():
 
     return {
         'valid_auth_json': valid_auth_json,
-        'invalid_auth_json': invalid_auth_json,
+        'invalid_clientid_auth_json': invalid_clientid_auth_json,
+        'invalid_userpass_auth_json': invalid_userpass_auth_json,
         'token_expire_json': token_expire_json,
         'search_explore_payload': search_explore_payload
     }

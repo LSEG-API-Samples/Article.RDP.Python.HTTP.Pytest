@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np
 from dotenv import load_dotenv
 
-load_dotenv()  # take environment variables from .env.
+load_dotenv(override=True)  # take environment variables from .env.
 
 from rdp_controller import rdp_http_controller
 
