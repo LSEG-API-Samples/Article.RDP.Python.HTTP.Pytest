@@ -9,7 +9,7 @@ ALL EXAMPLE CODE IS PROVIDED ON AN “AS IS” AND “AS AVAILABLE” BASIS FOR 
 
 ## <a id="pytest_intro"></a>Introduction to Python Pytest framework
 
-The [pytest](https://docs.pytest.org/en/7.2.x/) is one of the most popular all-purpose Python testing framework. This open-source framework lets developers/QAs write a small, readable, and scalable test cases that suitable for both simple function testing and complex applications. Comparing to the bulky class-based unit test framework like Python's built-in [unittest](https://docs.python.org/3.9/library/unittest.html), the pytest framework has easier learning curve with more flexibility.
+The [pytest](https://docs.pytest.org/en/7.2.x/) is one of the most popular all-purpose Python testing frameworks. This open-source framework lets developers/QAs write small, readable, and scalable test cases that are suitable for both simple function testing and complex applications. Comparing to the bulky class-based unit test framework like Python's built-in [unittest](https://docs.python.org/3.9/library/unittest.html), the pytest framework has an easier learning curve with more flexibility.
 
 Pytest Features:
 - Use the Python standard [assert statement](https://docs.python.org/3.9/reference/simple_stmts.html#assert) for verifying expectations and values in Python tests, no more ```self.assertXXX``` methods like the unittest
@@ -99,29 +99,29 @@ This example project is a Python console application that login to the RDP platf
 ├── app.py
 ├── pytest-article.md
 ├── rdp_controller
-│   ├── __init__.py
-│   └── rdp_http_controller.py
+│   ├── __init__.py
+│   └── rdp_http_controller.py
 ├── requirements.txt
 ├── requirements_test.txt
 └── tests
     ├── __init__.py
     ├── conftest.py
     ├── data
-    │   ├── test_auth_fixture.json
-    │   ├── test_esg_fixture.json
-    │   ├── test_esg_invalid_fixture.json
-    │   ├── test_search_fixture.json
-    │   ├── test_search_invalid_fixture.json
-    │   └── test_token_expire_fixture.json
+    │   ├── test_auth_fixture.json
+    │   ├── test_esg_fixture.json
+    │   ├── test_esg_invalid_fixture.json
+    │   ├── test_search_fixture.json
+    │   ├── test_search_invalid_fixture.json
+    │   └── test_token_expire_fixture.json
     ├── pytest.ini
     ├── test_app.py
     └── test_rdp_http_controller.py
 ```
 
-*Note*: The Docker and git related files are not shown in the project structure above. 
+*Note*: The Docker and git-related files are not shown in the project structure above. 
 
 * app.py: The main console application.
-* rdp_controller/rdp_http_controller.py: The main HTTP operations class. This is our focusing class for unit testing.
+* rdp_controller/rdp_http_controller.py: The main HTTP operations class. This is our focus class for unit testing.
 * tests/conftest.py: The root file that provides fixtures for all test cases in the ```tests``` folder.
 * tests/pytest.ini: The pytest settings configuration file.
 * tests/test_rdp_http_controller.py: The main test cases file that tests all rdp_http_controller.py class's methods. This is our focus test suite in this project.
@@ -134,7 +134,7 @@ Let’s start with the class that operates HTTP request-response messages with t
 
 It loads the test configurations such as the RDP APIs URLs from a ```.env.test``` environment variables file.
 
-Let's start with setting up the test configurations, resources and environment variables. This project keeps the test configurations such as mock RDP credentials, API URLs in a ```${project root}/.env.test``` environment variables file. And then uses the [pytest-dotenv](https://pypi.org/project/pytest-dotenv/) plugin it to the ```os.environ``` variable without hardcoded path reference to the file.
+Let's start with setting up the test configurations, resources, and environment variables. This project keeps the test configurations such as mock RDP credentials, and API URLs in a ```${project root}/.env.test``` environment variables file. And then uses the [pytest-dotenv](https://pypi.org/project/pytest-dotenv/) plugin to the ```os.environ``` variable without hardcoded path reference to the file.
 
 To load a custom environment variables into pytest, we create a pytest configuration file named ```pytest.ini``` at the root of ```tests``` folder to specify where the ```env_var``` is and overriding any variables already defined in the process' environment.
 
@@ -145,9 +145,9 @@ env_files = ../.env.test
 ```
 *Note*: This plugin uses the [python-dotenv](https://pypi.org/project/python-dotenv/) under the hood, so the python-dotenv dependency will be installed too.
 
-This ```os.environ``` environment variables and the ```RDPHTTPController``` class will be used in almost every test cases, so we set them as a *fixtures*. The fixture can be are data, class, preconditions states, context, or resources needed to run a test. Unlike the unittest framework,the [pytest fixture](https://docs.pytest.org/en/6.2.x/fixture.html) is in a function form that can be used in a modular manner.
+This ```os.environ``` environment variables and the ```RDPHTTPController``` class will be used in almost every test case, so we set them as a *fixtures*. The fixture can be are data, class, preconditions states, context, or resources needed to run a test. Unlike the unittest framework,the [pytest fixture](https://docs.pytest.org/en/6.2.x/fixture.html) is in a functional form that can be used in a modular manner.
 
-The pytest fixtures are defined using the ```@pytest.fixture``` decorator. It can be defined in a test case (supports only in that test case) or in a ```conftest.py``` file (for sharing fixtures to all test cases in the same directory). This project uses the later case, so the content of a ```conftest.py``` file is as follows:
+The pytest fixtures are defined using the ```@pytest.fixture``` decorator. It can be defined in a test case (supports only in that test case) or in a ```conftest.py``` file (for sharing fixtures to all test cases in the same directory). This project uses the latter case, so the content of a ```conftest.py``` file is as follows:
 
 ``` Python
 # conftest.py
@@ -172,7 +172,7 @@ def supply_test_class():
 ```
 The ```supply_test_config``` fixture function is for the ```os.environ``` environment variable dictionary and the ```supply_test_class``` fixture function is for sharing the ```RDPHTTPController``` class among test cases. The test cases can use those fixture functions separately based on each test requirement. 
 
-You may be noticed the ````scope='class'``` in the ```@pytest.fixture(scope='class')``` decorator, it means the fixture will be destroyed during teardown of the last test in the class.
+You may be noticed the ````scope='class'``` in the ```@pytest.fixture(scope='class')``` decorator, which means the fixture will be destroyed during teardown of the last test in the class.
 
 That is all for the fixture preparation.
 
@@ -273,7 +273,7 @@ def test_login_rdp_success(supply_test_config,supply_test_class):
 
 The ```test_login_rdp_success()``` test case *requests* the ```supply_test_config``` and ```supply_test_class``` fixtures as function parameters. We get the RDPHTTPController object (as ```app``` function variable) and the RDP Auth URL endpoint string (as ```auth_endpoint``` function variable) from the *supply_test_config* and *supply_test_class* fixtures to use as the test case's resources. 
 
-The ```test_login_rdp_success()``` is a test case for the success RDP Authentication login scenario. It just sends the RDP Auth Service URL and RDP credentials to the ```RDPHTTPController.rdp_authentication()``` method and checks the response token information. Please noticed that a unit test just focuses on if the rdp_authentication() returns no empty/zero token information only. The token content validation would be in a system test (or later) phase.
+The ```test_login_rdp_success()``` is a test case for the successful RDP Authentication login scenario. It just sends the RDP Auth Service URL and RDP credentials to the ```RDPHTTPController.rdp_authentication()``` method and checks the response token information. Please noticed that a unit test just focuses on if the rdp_authentication() returns no empty/zero token information only. The token content validation would be in a system test (or later) phase.
 
 ``` Python
     assert access_token is not None, "access token is None, success RDP Authentication returns invalid data"
@@ -281,9 +281,9 @@ The ```test_login_rdp_success()``` is a test case for the success RDP Authentica
     assert expires_in > 0, "expires_in is 0, success RDP Authentication returns invalid data"
 ```
 
-Please see more detail about the assertions in test on the [pytest framework](https://docs.pytest.org/en/7.1.x/how-to/assert.html page.
+Please see more detail about the assertions in the test on the [pytest framework](https://docs.pytest.org/en/7.1.x/how-to/assert.html page.
 
-What is about checking how the ```rpd_authentication()``` handles empty or none parameters? We create a new ```test_login_rdp_none_empty_params()``` test case to check if the method throws the TypeError exception and not return token information to a caller as expected. The code is shown below.
+What is about checking how the ```rpd_authentication()``` handles empty or none parameters? We create a new ```test_login_rdp_none_empty_params()``` test case to check if the method throws the TypeError exception and does not return token information to a caller as expected. The code is shown below.
 
 ``` Python
 # test_rdp_http_controller.py
@@ -347,4 +347,141 @@ A mock is a fake object that is constructed to look and act like real data withi
 
 The purpose of mocking is to isolate and focus on the code being tested and not on the behavior or state of external dependencies. By mocking out external dependencies, developers can run tests as often without being affected by any unexpected changes or irregularities of those dependencies. Mocking also helps developers save time and computing resources if they have to test HTTP requests that fetch a lot of data.
 
-I have demonstrates how to use the [Responses](https://github.com/getsentry/responses)  in the [previous unittest framework project](https://github.com/Refinitiv-API-Samples/Article.RDP.Python.HTTP.UnitTest). I am using other popular Requests mocking library which is [requests-mock](https://requests-mock.readthedocs.io/en/latest/) with this pytest project.
+I have demonstrated how to use the [Responses](https://github.com/getsentry/responses) mocking library in the [previous unittest framework project](https://github.com/Refinitiv-API-Samples/Article.RDP.Python.HTTP.UnitTest). I am using other popular Requests mocking library which is [requests-mock](https://requests-mock.readthedocs.io/en/latest/) with this pytest example.
+
+### <a id="add_mock_test"></a>Adding a mock Object to the test case
+
+So, I will start with a mock object for testing a successful RDP login case. Firstly, create a *supply_test_mock_json* fixture method with a dummy content of the RDP authentication success response message in a *contfest.py* file. 
+
+``` Python
+# conftest.py
+
+# Supply test static JSON mock messages
+@pytest.fixture(scope='class')
+def supply_test_mock_json():
+    #  Mock the RDP Auth Token success Response JSON
+    valid_auth_json = {
+        'access_token': 'access_token_mock1mock2mock3mock4mock5',
+        'refresh_token': 'refresh_token_mock1mock2mock3mock4mock5',
+        'expires_in': '600',
+        'scope': 'test1 test2 test3 test4 test5',
+        'token_type': 'Bearer'
+    }
+
+
+
+    return {
+        'valid_auth_json': valid_auth_json
+    }
+```
+
+And then we can modify ```test_login_rdp_success``` test case and other test cases to request this ```supply_test_mock_json``` fixture as a function argument. 
+
+The requests-mock library provides an external fixture registered with pytest for developers. Developers can simply just specifying ```requests-mock``` as a function parameter without the need to import ```requests-mock``` library in the test files (you still need to install [the library](https://pypi.org/project/requests-mock/)). Once the ```requests-mock``` is loaded to a test case, developers can specify the endpoint URL, HTTP method, status response, response message, etc of that request via a ```requests_mock.post()``` and ```requests_mock.get()``` methods.
+
+Example:
+
+``` Python
+# test_rdp_http_controller.py
+
+def test_login_rdp_success(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
+    """
+    Test that it can log in to the RDP Auth Service
+    """
+    auth_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_AUTH_URL']
+    username = supply_test_config['RDP_USERNAME']
+    password = supply_test_config['RDP_PASSWORD']
+    client_id = supply_test_config['RDP_CLIENTID']
+
+    app = supply_test_class
+
+    access_token = None
+    refresh_token = None
+    expires_in = 0
+
+    requests_mock.post(
+        url= auth_endpoint, 
+        json = supply_test_mock_json['valid_auth_json'], 
+        status_code = 200,
+        headers = {'Content-Type':'application/json'}
+        )
+
+    # Calling RDPHTTPController rdp_authentication() method
+    access_token, refresh_token, expires_in = app.rdp_authentication(auth_endpoint, username, password, client_id)
+    # Assertions
+    ...
+```
+The code above set a Responses mock object with the *https://api.refinitiv.com/auth/oauth2/v1/token* URL and HTTP *POST* method. The requests-mock library then returns a ```valid_auth_json``` JSON message with HTTP status *200* and Content-Type *application/json* from the ```supply_test_mock_json``` fixture to the application for all HTTP *POST* request messages to *https://api.refinitiv.com/auth/oauth2/v1/token* URL without any network operations between the machine and the actual RDP endpoint.
+
+### <a id="unittest_rdp_authen_fail"></a>Testing Invalid RDP Client ID Authentication Request-Response
+
+This mock object is also useful for testing false cases such as invalid login too.  The ```test_login_rdp_invalid()``` method is a test case for the RDP Authentication login failure scenario. We set a Responses mock object for the *https://api.refinitiv.com/auth/oauth2/v1/token* URL and HTTP *POST* method with the expected error response message and status (401 - Unauthorized). 
+
+``` Python
+# test_rdp_http_controller.py
+
+def test_login_rdp_invalid_clientID(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
+    """
+    Test that it can handle some invalid credentials
+    """
+    auth_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_AUTH_URL']
+    app = supply_test_class
+
+    access_token = None
+    refresh_token = None
+    expires_in = 0
+
+    requests_mock.post(
+        url= auth_endpoint, 
+        json = supply_test_mock_json['invalid_clientid_auth_json'], 
+        status_code = 401,
+        headers = {'Content-Type':'application/json'}
+        )
+
+
+    username = 'wrong_user1'
+    password = 'wrong_password1'
+    client_id = 'XXXXX'
+    access_token = None
+    refresh_token = None
+    expires_in = 0
+    ...
+```
+Once the ```rdp_authentication()``` method is called, the test case verifies if the method raises the ```requests.exceptions.HTTPError``` exception with the expected error message and status. The test case also makes assertions to check if the method does not return token information to a caller.
+
+``` Python
+# test_rdp_http_controller.py
+
+def test_login_rdp_invalid_clientID(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
+    ....
+
+    with pytest.raises(requests.exceptions.HTTPError) as excinfo:
+        access_token, refresh_token, expires_in = app.rdp_authentication(auth_endpoint, username, password, client_id)
+    
+    assert access_token is None, "Invalid clientID returns Access Token"
+    assert refresh_token is None, "Invalid clientID returns Refresh Token"
+    assert expires_in == 0, "Invalid Login returns expires_in"
+    assert '401' in str(excinfo.value), "Invalid clientID returns wrong HTTP Status Code"
+    assert 'RDP authentication failure' in str(excinfo.value),"Invalid Login returns wrong Exception description"
+
+    json_error = json.loads(str(excinfo.value).split('-')[1])
+    assert type(json_error) is dict, "Invalid Login returns wrong Exception detail type"
+```
+
+With mocking, a test case never needs to send actual request messages to the RDP APIs, so we can test more scenarios for other RDP services too.
+
+## <a id="rdp_get_data"></a>Unit Testing for RDP APIs Data Request
+
+That brings us to requesting the RDP APIs data. All subsequent REST API calls use the Access Token via the *Authorization* HTTP request message header as shown below to get the data. 
+- Header: 
+    * Authorization = ```Bearer <RDP Access Token>```
+
+Please notice *the space* between the ```Bearer``` and ```RDP Access Token``` values.
+
+The application then creates a request message in a JSON message format or URL query parameter based on the interested service and sends it as an HTTP request message to the Service Endpoint. Developers can get RDP APIs the Service Endpoint, HTTP operations, and parameters from Refinitiv Data Platform's [API Playground page](https://api.refinitiv.com/) - which is an interactive documentation site developers can access once they have a valid Refinitiv Data Platform account.
+
+The example console application consumes content from the following RDP Services:
+- ESG Service ```/data/environmental-social-governance/<version>/views/scores-full``` endpoint that provides full coverage of Refinitiv's proprietary ESG Scores with full history for consumers.
+- Discovery Search Explore Service ```/discover/search/<version>/explore``` endpoint that explore Refinitiv data based on searching options.
+
+However, this development article covers the Search Explore Service test cases only. The ESG Service's test cases have the same test logic as the Discovery Search Explore's test cases.
