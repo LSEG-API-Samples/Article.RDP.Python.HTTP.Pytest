@@ -368,8 +368,6 @@ def supply_test_mock_json():
         'token_type': 'Bearer'
     }
 
-
-
     return {
         'valid_auth_json': valid_auth_json
     }
@@ -415,7 +413,31 @@ The code above set a Responses mock object with the *https://api.refinitiv.com/a
 
 ### <a id="unittest_rdp_authen_fail"></a>Testing Invalid RDP Client ID Authentication Request-Response
 
-This mock object is also useful for testing false cases such as invalid login too.  The ```test_login_rdp_invalid()``` method is a test case for the RDP Authentication login failure scenario. We set a Responses mock object for the *https://api.refinitiv.com/auth/oauth2/v1/token* URL and HTTP *POST* method with the expected error response message and status (401 - Unauthorized). 
+This mock object is also useful for testing false cases such as invalid login too.  The ```test_login_rdp_invalid()``` method is a test case for the RDP Authentication login failure scenario. I am starting by add a new ```invalid_clientid_auth_json``` dummy content of the RDP invalid ClientID log response to a *supply_test_mock_json* fixture method.
+
+``` Python
+# conftest.py
+
+# Supply test static JSON mock messages
+@pytest.fixture(scope='class')
+def supply_test_mock_json():
+    #  Mock the RDP Auth Token success Response JSON
+    valid_auth_json = {
+        ...
+    }
+    ...
+    invalid_clientid_auth_json = {
+        'error': 'invalid_client',
+        'error_description': 'Invalid Application Credential.',
+    }
+
+    return {
+        'valid_auth_json': valid_auth_json,
+        'invalid_clientid_auth_json': invalid_clientid_auth_json
+    }
+```
+
+And then we set a Responses mock object for the *https://api.refinitiv.com/auth/oauth2/v1/token* URL and HTTP *POST* method with the expected error response message and status (401 - Unauthorized) that is loaded from this ```supply_test_mock_json``` fixture. 
 
 ``` Python
 # test_rdp_http_controller.py
@@ -485,3 +507,256 @@ The example console application consumes content from the following RDP Services
 - Discovery Search Explore Service ```/discover/search/<version>/explore``` endpoint that explore Refinitiv data based on searching options.
 
 However, this development article covers the Search Explore Service test cases only. The ESG Service's test cases have the same test logic as the Discovery Search Explore's test cases.
+
+## <a id="pytest_rdp_search"></a>Unit Testing HTTP Request Source Code for The RDP Discovery Search Explore Service
+
+Now let me turn to test the Discovery Search Explore service endpoint. The code in the ```rdp_controller/rdp_http_controller.py``` class for requesting the search result data is shown below.
+
+``` Python
+# rdp_controller/rdp_http_controller.py
+
+# Send HTTP Post request to the RDP Search Explore Service
+def rdp_request_search_explore(self, search_url, access_token, payload):
+
+    if not search_url or not access_token or not payload:
+        raise TypeError('Received invalid (None or Empty) arguments')
+
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': f'Bearer {access_token}'
+    }
+
+    try:
+        response = requests.post(search_url, headers = headers, data = json.dumps(payload))
+    except requests.exceptions.RequestException as exp:
+        print(f'Caught exception: {exp}')
+        return None
+        
+    if response.status_code == 200:  # HTTP Status 'OK'
+        print('Receive Search Explore Data from RDP APIs')
+    else:
+        print(f'RDP APIs: Search Explore request failure: {response.status_code} {response.reason}')
+        print(f'Text: {response.text}')
+        raise requests.exceptions.HTTPError(f'Search Explore request failure: {response.status_code} - {response.text} ', response = response )
+
+    return response.json()
+```
+
+The ```rdp_request_search_explore()``` method above just create the request message payload, and send it to the RDP Search Explore service as HTTP POST request with the Requests ```requests.post()``` method. The return values can be as follows
+- If the request success (HTTP status is 200), returns the response data in JSON message format.
+- If the URL or access token, or universe values are empty or none, raise the TypeError exception to the caller.
+- If the request fails, raise the Requests' HTTPError exception to the caller with HTTP status response information.
+
+### <a id="unittest_rdp_esg_success"></a>Testing a valid RDP Search Explore Request-Response
+
+The first test case is the request success scenario. I will begin by creating a test-content file with a valid Search Explore response message. A file is *rdp_test_esg_fixture.json* in a *tests/data* folder.
+
+``` JSON
+{
+  "links": {
+    "count": 5
+  },
+  "variability": "variable",
+  "universe": [
+    {
+      "Instrument": "TEST.RIC",
+      "Company Common Name": "TEST ESG Data",
+      "Organization PermID": "XXXXXXXXXX",
+      "Reporting Currency": "USD"
+    }
+  ],
+  "data": [
+    [
+      "TEST.RIC",
+      "2021-12-31",
+      99.9999999999999,
+      99.9999999999999,
+      ...
+    ],
+   ...
+  ],
+  ...
+  ,
+  "headers": [
+    ....
+    {
+      "name": "TEST 1",
+      "title": "ESG Score",
+      "type": "number",
+      "decimalChar": ".",
+      "description": "TEST description"
+    }...
+  ]
+}
+```
+
+We are not going to load this data into *conftest.py* fixture because only one test case uses this dummy data. We are using it as a test data resource with the [pytest-datadir](https://pypi.org/project/pytest-datadir/) library. The pytest-datadir will copy the original file to a temporary folder, so changing the file contents won't change the original data file and the test case can use it in the test assertions.
+
+However, the RDP Search request message will be reused by multiple test cases as a based line for each test's request message payload, so we add it as a new ```search_explore_payload``` content to a *supply_test_mock_json* fixture method as follows.
+
+``` Python
+# conftest.py
+
+@pytest.fixture(scope='class')
+def supply_test_mock_json():
+    #  Mock the RDP Auth Token success Response JSON
+    ...
+    search_explore_payload = {
+        'View': 'Entities',
+        'Filter': '',
+        'Select': 'IssuerCommonName,DocumentTitle,RCSExchangeCountryLeaf,IssueISIN,ExchangeName,ExchangeCode,SearchAllCategoryv3,RCSTRBC2012Leaf',
+    }
+
+    return {
+        'valid_auth_json': valid_auth_json,
+        'invalid_clientid_auth_json': invalid_clientid_auth_json,
+        'search_explore_payload': search_explore_payload
+    }
+
+```
+
+Next, create the ```test_request_search_explore()``` method in the test_rdp_http_controller.py file to test the easiest test case, the successful ESG data request-response scenario.  
+ 
+``` Python
+# test_rdp_http_controller.py
+
+def test_request_search_explore(supply_test_config,supply_test_class, supply_test_mock_json,shared_datadir, requests_mock):
+    """
+    Test that it can get RIC's metadata via the RDP Search Explore Service
+    """
+    search_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_SEARCH_EXPLORE_URL']
+    app = supply_test_class
+    universe = 'TEST.RIC'
+  
+    payload = supply_test_mock_json['search_explore_payload']
+    payload['Filter'] =f'RIC eq \'{universe}\''
+
+    # Mock RDP ESG View Score valid response JSON
+    contents = (shared_datadir / 'test_search_fixture.json').read_text()
+    valid_response = json.loads(contents)
+
+    requests_mock.post(
+        url= search_endpoint, 
+        json = valid_response, 
+        status_code = 200,
+        headers = {'Content-Type':'application/json'}
+        )
+    
+    ...
+```
+The code above does the following tasks:
+- Injects the test data location via a ```shared_datadir``` function parameter to the test case
+- Read the ```test_search_fixture.json``` test data content from a ```shared_datadir``` folder to a ```valid_response``` variable
+- Create a request message based on the ```search_explore_payload``` message for the ```supply_test_mock_json``` fixture
+- Mock a request to the RDP ```https://api.refinitiv.com/discovery/search/v1/explore``` endpoint URL and ```valid_response``` variable.
+
+When the Requests library receives the HTTP POST request for that URL, it returns a mock Search result JSON object with HTTP Status *200* and Content-Type *application/json* to the application. The ```test_request_search_explore()``` method then verifies if the response data is in JSON/[Dictionaries](https://docs.python.org/3.9/tutorial/datastructures.html#dictionaries) type, and checks if the message contains the basic fields. 
+
+``` Python
+# test_rdp_http_controller.py
+
+def test_request_search_explore(supply_test_config,supply_test_class, supply_test_mock_json,shared_datadir, requests_mock):
+    """
+    Test that it can get RIC's metadata via the RDP Search Explore Service
+    """
+    ...
+    # Calling RDPHTTPController rdp_request_esg() method
+    response = app.rdp_request_search_explore(search_endpoint, supply_test_mock_json['valid_auth_json']['access_token'], payload)
+
+    assert type(response) is dict, 'Search request returns wrong data type'
+    assert 'Total' in response
+    assert 'Hits' in response
+```
+
+### <a id="pytest_rdp_search_expire"></a>Testing Requesting RDP Search service with an expired token
+
+That brings us to one of the most common RDP APIs failure scenarios, applications request data from RDP with an expired access token. 
+The ```test_request_search_explore_token_expire()``` method is the one for testing this case with the RDP ESG Service. 
+
+The first step is to add a mock token expired message ```token_expire_json``` to a ```supply_test_mock_json``` fixture. We add this to a fixture because we can reuse this token expired message in all RDP data services test cases as well.
+
+``` Python
+# conftest.py
+
+@pytest.fixture(scope='class')
+def supply_test_mock_json():
+    ...
+    # Mock the RDP Auth Token Expire Response JSON
+    token_expire_json = {
+        'error': {
+            'id': 'XXXXXXXXXX',
+            'code': '401',
+            'message': 'token expired',
+            'status': 'Unauthorized'
+        }
+    }
+
+    ...
+    return {
+        'valid_auth_json': valid_auth_json,
+        'invalid_clientid_auth_json': invalid_clientid_auth_json,
+        'token_expire_json': token_expire_json,
+        'search_explore_payload': search_explore_payload
+    }
+```
+
+The token expires error message is sent from the RDP services to applications with HTTP error status (401 - **As of Feb 2023**), the ```test_request_search_explore_token_expire()``` method simulates the token expire error message and HTTP 401 status with a mock object as follows.
+
+``` Python
+# test_rdp_http_controller.py
+
+def test_request_search_explore_token_expire(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
+    """
+    Test that it can handle token expiration requests
+    """
+    search_endpoint = supply_test_config['RDP_BASE_URL'] + supply_test_config['RDP_SEARCH_EXPLORE_URL']
+    app = supply_test_class
+    universe = 'TEST.RIC'
+    payload = supply_test_mock_json['search_explore_payload']
+    payload['Filter'] =f'RIC eq \'{universe}\''
+
+    requests_mock.post(
+        url= search_endpoint, 
+        json = supply_test_mock_json['token_expire_json'], 
+        status_code = 401,
+        headers = {'Content-Type':'application/json'}
+        )
+    ...
+
+```
+
+Next, this test case verifies if the ```rdp_request_search_explore()``` method raises the ```requests.exceptions.HTTPError``` exception with the expected token expired error message and status.
+
+``` Python
+# test_rdp_http_controller.py
+
+def test_request_search_explore_token_expire(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
+    """
+    Test that it can handle token expiration requests
+    """
+    ...
+    # Calling RDPHTTPController rdp_request_search_explore() method
+    with pytest.raises(requests.exceptions.HTTPError) as excinfo:
+        response = app.rdp_request_search_explore(search_endpoint, supply_test_mock_json['valid_auth_json']['access_token'], payload)
+
+    # verifying basic response
+
+    print('Exception = ' + str(excinfo.value))
+    assert '401' in str(excinfo.value), 'Access Token Expire returns wrong HTTP Status Code'
+    assert 'Unauthorized' in str(excinfo.value), 'Access Token Expire returns wrong error message'
+
+    json_error = json.loads(str(excinfo.value).split('401 -')[1])
+    assert type(json_error) is dict, 'Access Token Expire returns wrong data type'
+    assert 'error' in json_error, 'Access Token Expire returns wrong JSON error response'
+    assert 'message' in json_error['error'], 'Access Token Expire returns wrong JSON error response'
+    assert 'status' in json_error['error'], 'Access Token Expire returns wrong JSON error response'
+
+```
+
+The other common RDP APIs failure scenario is the application sends the request message to RDP without the access token in the HTTP request header. However, the *access token* is one of the ```rdp_request_search_explore()``` method required parameters. If the access token is not presented (None or Empty), the method raises the TypeError exception and does not send an HTTP request message to the RDP. The ```test_request_search_explore_none_empty()``` method is the one that covers this test case. There is also a ```test_request_search_explore_invalid_json()``` test case method in the file that demonstrates how to test invalid JSON request message scenario.
+
+### <a id="pytest_mark"></a>Bonus: Pytest Markers
+
+https://docs.pytest.org/en/7.1.x/how-to/mark.html
+
+https://docs.pytest.org/en/7.1.x/example/markers.html
