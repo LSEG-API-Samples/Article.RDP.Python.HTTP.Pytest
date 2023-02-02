@@ -28,7 +28,6 @@ A unit test helps developers to isolate what is broken in their application easi
 
 ![figure-1](images/01_unittest.png "Unit Testing Life Cycle")
 
-
 You can find more detail about the unit test concept from the following resources:
 - [Python Guide: Testing Your Code](https://docs.python-guide.org/writing/tests/) article.
 - [How and when to use Unit Testing properly](https://softwareengineering.stackexchange.com/questions/89064/how-and-when-to-use-unit-testing-properly) post.
@@ -129,7 +128,7 @@ The first step is to unzip or download the example project folder into a directo
 Example Result:
 ``` Bash
 (rdp_pytest) C:\rdp_python_pytest\test>pytest .
-=============================================== test session starts ================================================
+=============================================== test session starts ===============================================
 platform win32 -- Python 3.9.15, pytest-7.2.1, pluggy-1.0.0
 rootdir: C:\rdp_python_pytest\test    
 plugins: requests-mock-1.10.0
@@ -140,6 +139,18 @@ test_rdp_http_controller.py ............                                        
 
 ================================================ 15 passed in 0.17s =================================================
 ```
+
+## <a id="summary"></a>Conclusion and Next Steps
+
+Unit testing is now the mandatory process of a software development lifecycle for both modern and legacy applications. It helps to expose unintentional behaviors of a tiny part of the application quicker than trying to find bugs in a big complex phase. It speeds up the overall feedback loop and improves trust among the project team. Unit testing also helps improves application source code quality, developers have more confidence in refactoring the source code for better performance and cleaner code. As the author of this article, I also have learned a lot from this project. There are a lot of error handlers or code logic that I never think of until I started to write unit test cases. 
+
+This example project demonstrates the manual unit testing method. However, developers should run unit test cases automatically every time they made changes to the code (or configurations). The most practical technique is running automated unit tests as part of the developers' Continuous Integration/Continuous Delivery (CI/CD) pipeline. Developers can apply the TDD (Test-driven development) approach that writing and correcting the failed tests before writing new code with their project too.
+
+![figure-4](images/04_tdd.png "TDD Life Cycle")
+
+The [pytest](https://docs.pytest.org/en/7.2.x/) test framework and [requests-mock](https://pypi.org/project/requests-mock/) mocking library are other good choices to learn a unit testing with [Python](https://www.python.org/) and HTTP REST application. They are easy to learn, provide powerful but simple to use features for developers, and also supports a lot of plugins and Python development frameworks.
+
+At the same time, the [Refinitiv Data Platform (RDP) APIs](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) provide various Refinitiv data and content for developers via an easy-to-use Web-based API. The APIs are easy to integrate into any application and platform that supports the HTTP protocol and JSON message format. 
 
 ## <a id="references"></a>References
 
@@ -153,7 +164,6 @@ That brings me to the end of my unit test example project. For further details, 
 * [Python pytest framework official page](https://docs.pytest.org/en/7.2.x/).
 * [Python requests-mock library page](https://requests-mock.readthedocs.io/en/latest/).
 * [Using pytest - Real Python](https://realpython.com/lessons/using-pytest/) website.
-
 
 For any questions related to Refinitiv Data Platform APIs, please use the [RDP APIs Forum](https://community.developers.refinitiv.com/spaces/231/index.html) on the [Developers Community Q&A page](https://community.developers.refinitiv.com/).
 

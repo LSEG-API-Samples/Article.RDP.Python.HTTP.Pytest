@@ -107,12 +107,10 @@ This example project is a Python console application that login to the RDP platf
     ├── __init__.py
     ├── conftest.py
     ├── data
-    │   ├── test_auth_fixture.json
     │   ├── test_esg_fixture.json
     │   ├── test_esg_invalid_fixture.json
     │   ├── test_search_fixture.json
-    │   ├── test_search_invalid_fixture.json
-    │   └── test_token_expire_fixture.json
+    │   └── test_search_invalid_fixture.json
     ├── pytest.ini
     ├── test_app.py
     └── test_rdp_http_controller.py
@@ -755,8 +753,114 @@ def test_request_search_explore_token_expire(supply_test_config,supply_test_clas
 
 The other common RDP APIs failure scenario is the application sends the request message to RDP without the access token in the HTTP request header. However, the *access token* is one of the ```rdp_request_search_explore()``` method required parameters. If the access token is not presented (None or Empty), the method raises the TypeError exception and does not send an HTTP request message to the RDP. The ```test_request_search_explore_none_empty()``` method is the one that covers this test case. There is also a ```test_request_search_explore_invalid_json()``` test case method in the file that demonstrates how to test invalid JSON request message scenario.
 
+That covers the Discovery Search Explore service test cases. If you are interested in RDP ESG service test cases, please check the ```test_request_esg_xxx``` methods which have the same testing and mocking logic as all previous cases that I have mentions above.
+
 ### <a id="pytest_mark"></a>Bonus: Pytest Markers
 
-https://docs.pytest.org/en/7.1.x/how-to/mark.html
+Now we come to one of the most unique features of pytest, the *markers*. The pytest framework supports test case metadata setting known as *markers* (```pytest.mark```). The markers are used by plugins, and are commonly used to run or skip tests with specific marker. Here are some of the builtin markers:
+- *skip*: always skip a test function
+- *skipif* - skip a test function if a certain condition is met
+- *xfail* - produce an “expected failure” outcome if a certain condition is met
+- *parametrize* - perform multiple calls to the same test function.
 
-https://docs.pytest.org/en/7.1.x/example/markers.html
+The framework also supports [custom markers](https://docs.pytest.org/en/7.1.x/example/markers.html#working-with-custom-markers) to match the project's requirement too. Once the custom markers has been set, developers can run ```pytest -m <mark>``` for run test specific tests.
+
+To create custom markers, the first thing you need to do is define your markers for grouping test cases in the ```pytest.ini``` configuration file as follows:
+
+``` INI
+[pytest]
+markers = 
+    test_login: marks RDP login methods test
+    test_esg: marks RDP ESG methods test
+    test_search: marks RDP Search methods test
+    test_valid: marks valid methods call test
+    empty_case: marks for None/Empty param methods call test
+env_override_existing_values = 1
+env_files = ../.env.test
+```
+Then, add the marker to test methods in ```test_rdp_http_controller.py``` file with ```@pytest.mark.<custom mark>``` decorator. Please see the example modified code below.
+
+``` Python
+# test_rdp_http_controller.py
+
+@pytest.mark.test_valid
+@pytest.mark.test_login
+def test_login_rdp_success(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
+    """
+    Test that it can log in to the RDP Auth Service
+    """
+    ...
+
+@pytest.mark.test_login
+def test_login_rdp_invalid_clientID(supply_test_config,supply_test_class, supply_test_mock_json, requests_mock):
+    """
+    Test that it can handle some invalid credentials
+    """
+    ...
+
+@pytest.mark.test_valid
+@pytest.mark.test_esg
+def test_request_esg(supply_test_config,supply_test_class, supply_test_mock_json,shared_datadir, requests_mock):
+    """
+    Test that it can request ESG Data
+    """
+    ...
+
+@pytest.mark.empty_case
+@pytest.mark.test_search
+def test_request_search_explore_none_empty(supply_test_class,supply_test_mock_json):
+    """
+    Test that the Search Explore function can handle none/empty input
+    """
+    ...
+```
+
+Please be noticed that you can set multiple markers to each test method. 
+
+In order to run specific markers, you can run pytest with ```-m <mark>``` command as follows:
+
+Example: Run only success scenarios test cases:
+
+``` Bash
+(rdp_pytest) C:\rdp_python_pytest\test>pytest -m test_valid -v
+=============================================== test session starts ================================================
+platform win32 -- Python 3.9.15, pytest-7.2.1, pluggy-1.0.0 -- C:\...\Miniconda3\envs\rdp_pytest\python.exe
+cachedir: .pytest_cache
+rootdir: C:\rdp_python_pytest\tests, configfile: pytest.ini
+plugins: datadir-1.4.1, dotenv-0.5.2, requests-mock-1.10.0
+collected 16 items / 12 deselected / 4 selected
+
+test_rdp_http_controller.py::test_login_rdp_su                                                                 [ 25%] 
+test_rdp_http_controller.py::test_login_rdp_refreshtoken PASSED                                                [ 50%] 
+test_rdp_http_controller.py::test_request_esg PASSED                                                           [ 75%]
+test_rdp_http_controller.py::test_request_search_explore PASSED                                                [100%]
+
+=============================================== 4 passed, 12 deselected in 0.18s ================================================ 
+```
+You can select multiple markers with ```and``` , ```or```, ```not``` operators to combine multiple markers. The following example shows how to specify only RDP ESG service unsuccess test cases.
+
+``` Bash
+(rdp_pytest) C:\rdp_python_pytest\test>pytest -m "not test_valid and test_esg" -v 
+=============================================== test session starts ================================================
+platform win32 -- Python 3.9.15, pytest-7.2.1, pluggy-1.0.0 -- C:\...\Miniconda3\envs\rdp_pytest\python.exe
+cachedir: .pytest_cache
+rootdir: C:\rdp_python_pytest\tests, configfile: pytest.ini
+plugins: datadir-1.4.1, dotenv-0.5.2, requests-mock-1.10.0
+collected 16 items / 13 deselected / 3 selected
+
+test_rdp_http_controller.py::test_request_esg_token_expire PASSED                                            [ 33%]
+test_rdp_http_controller.py::test_request_esg_invalid_ric PASSED                                             [ 66%]
+test_rdp_http_controller.py::test_request_esg_none_empty PASSED                                              [100%] 
+
+=============================================== 3 passed, 13 deselected in 0.13s ================================================
+```
+Please see more detail about pytest markers and custom markers from the following resources:
+- [pytest document: How to mark test functions with attributes](https://docs.pytest.org/en/7.1.x/how-to/mark.html#how-to-mark-test-functions-with-attributes)
+- [pytest document: Working with custom markers](https://docs.pytest.org/en/7.1.x/example/markers.html#working-with-custom-markers)
+- [pytest document: Raising errors on unknown marks](https://docs.pytest.org/en/stable/how-to/mark.html#raising-errors-on-unknown-marks)
+
+That’s all I have to say about unit testing the Python HTTP code with Requests and Responses libraries.
+
+## <a id="how_to_run"></a>How to run the example test suite
+
+Please see how to run the project test suit in the [README.md](README.md#how_to_run) file.
