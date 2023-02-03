@@ -22,7 +22,7 @@ This demo project is not cover all test cases for the HTTP operations and all RD
 
 ## Unit Testing Overview
 
-[Unit testing](https://en.wikipedia.org/wiki/Unit_testing) is the smallest test that focuses on checking that a single part of the application operates correctly. It breaks an application into the smallest, isolated, testable component called *units*, and then tests them individually. The unit is mostly a function or method call or procedure in the application source code. Developers and QA can test each unit by sending any data into that unit and see if it functions as intended. 
+Let’s start with what unit test is. [Unit testing](https://en.wikipedia.org/wiki/Unit_testing) is the smallest test that focuses on checking that a single part of the application operates correctly. It breaks an application into the smallest, isolated, testable component called *units*, and then tests them individually. The unit is mostly a function or method call or procedure in the application source code. Developers and QA can test each unit by sending any data into that unit and see if it functions as intended. 
 
 A unit test helps developers to isolate what is broken in their application easier and faster than testing an entire system as a whole. It is the first level of testing done during the development process before integration testing. It is mostly done by the developers automated or manually to verify their code.
 
@@ -34,11 +34,63 @@ You can find more detail about the unit test concept from the following resource
 
 ## Introduction to Pytest framework
 
-TBD
+The [pytest](https://docs.pytest.org/en/7.2.x/) (or sometime called py.test) is one of the most popular all-purpose Python testing frameworks. This open-source framework lets developers/QAs write small, readable, and scalable test cases that are suitable for both simple function testing and complex applications. Comparing to the bulky class-based unit test framework like Python's built-in [unittest](https://docs.python.org/3.9/library/unittest.html), the pytest framework has an easier learning curve with more flexibility.
+
+Pytest Key Features:
+- Use the Python standard [assert statement](https://docs.python.org/3.9/reference/simple_stmts.html#assert) for verifying expectations and values in Python tests, no more ```self.assertXXX``` methods like the unittest
+- [Auto-discovery](https://docs.pytest.org/en/7.2.x/explanation/goodpractices.html#test-discovery) of test modules and functions
+- [Modular fixtures](https://docs.pytest.org/en/7.2.x/reference/fixtures.html#fixture) for managing small or parametrized long-lived test resources
+- You can run unittest cases with pytest too!
+- Provide a lot of official and community plugins for extending the framework capability and integrations.
+
+Example from [pytest official page](https://docs.pytest.org/en/7.1.x/getting-started.html#create-your-first-test):
+``` Python
+# test_sample.py
+def func(x):
+    return x + 1
+
+
+def test_answer():
+    assert func(3) == 5
+```
+
+To run the test, just run the following command:
+``` bash
+pytest .
+```
+Result:
+``` bash
+=========================== test session starts ============================
+platform linux -- Python 3.x.y, pytest-7.x.y, pluggy-1.x.y
+rootdir: /home/sweet/project
+collected 1 item
+
+test_sample.py F                                                     [100%]
+
+================================= FAILURES =================================
+_______________________________ test_answer ________________________________
+
+    def test_answer():
+>       assert func(3) == 5
+E       assert 4 == 5
+E        +  where 4 = func(3)
+
+test_sample.py:6: AssertionError
+========================= short test summary info ==========================
+FAILED test_sample.py::test_answer - assert 4 == 5
+============================ 1 failed in 0.12s =============================
+```
+
+Please find more detail about the pytest framework from the following resources:
+- [pytest official page](https://docs.pytest.org/en/7.2.x/)
+- [pytest getting started page](https://docs.pytest.org/en/7.2.x/getting-started.html)
+- [Using pytest - Real Python](https://realpython.com/lessons/using-pytest/)
+
+Let’s leave the pytest framework overview there.
 
 ## <a id="whatis_rdp"></a>What is Refinitiv Data Platform (RDP) APIs?
 
-The [Refinitiv Data Platform (RDP) APIs](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) provide various Refinitiv data and content for developers via easy-to-use Web-based API.
+Now let me turn to our example HTTP API for this project. The [Refinitiv Data Platform (RDP) APIs](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) provide various Refinitiv data and content for developers via easy-to-use Web-based API.
 
 RDP APIs give developers seamless and holistic access to all of the Refinitiv content such as Environmental Social and Governance (ESG), News, Research, etc, and commingled with their content, enriching, integrating, and distributing the data through a single interface, delivered wherever they need it.  The RDP APIs delivery mechanisms are the following:
 * Request - Response: RESTful web service (HTTP GET, POST, PUT or DELETE) 
@@ -53,6 +105,10 @@ This example project is focusing on the Request-Response: RESTful web service de
 For more detail regarding the Refinitiv Data Platform, please see the following APIs resources: 
 - [Quick Start](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/quick-start) page.
 - [Tutorials](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/tutorials) page.
+
+## <a id="testsuite_detail"></a>Test Suit Development Detail
+
+Please see the full details over the test suite implementation on the [pytest-article.md](pytest-article.md) file.
 
 ## <a id="prerequisite"></a>Prerequisite
 
@@ -140,9 +196,15 @@ test_rdp_http_controller.py ............                                        
 ================================================ 15 passed in 0.17s =================================================
 ```
 
+![figure-3](images/03_pytest_run_1.gif "Refinitiv Data Platform")
+
+Alternatively, you can use [VS Code Python testing tool](https://code.visualstudio.com/docs/python/testing#_configure-tests) to run test cases too. The ```.vscode``` project setting is included with the project.
+
+That covers how to run an example test suite.
+
 ## <a id="summary"></a>Conclusion and Next Steps
 
-Unit testing is now the mandatory process of a software development lifecycle for both modern and legacy applications. It helps to expose unintentional behaviors of a tiny part of the application quicker than trying to find bugs in a big complex phase. It speeds up the overall feedback loop and improves trust among the project team. Unit testing also helps improves application source code quality, developers have more confidence in refactoring the source code for better performance and cleaner code. As the author of this article, I also have learned a lot from this project. There are a lot of error handlers or code logic that I never think of until I started to write unit test cases. 
+That brings me to the end of this pytest project example. Unit testing is now the mandatory process of a software development lifecycle for both modern and legacy applications. It helps to expose unintentional behaviors of a tiny part of the application quicker than trying to find bugs in a big complex phase. It speeds up the overall feedback loop and improves trust among the project team. Unit testing also helps improves application source code quality, developers have more confidence in refactoring the source code for better performance and cleaner code. As the author of this article, I also have learned a lot from this project. There are a lot of error handlers or code logic that I never think of until I started to write unit test cases. 
 
 This example project demonstrates the manual unit testing method. However, developers should run unit test cases automatically every time they made changes to the code (or configurations). The most practical technique is running automated unit tests as part of the developers' Continuous Integration/Continuous Delivery (CI/CD) pipeline. Developers can apply the TDD (Test-driven development) approach that writing and correcting the failed tests before writing new code with their project too.
 
@@ -151,6 +213,8 @@ This example project demonstrates the manual unit testing method. However, devel
 The [pytest](https://docs.pytest.org/en/7.2.x/) test framework and [requests-mock](https://pypi.org/project/requests-mock/) mocking library are other good choices to learn a unit testing with [Python](https://www.python.org/) and HTTP REST application. They are easy to learn, provide powerful but simple to use features for developers, and also supports a lot of plugins and Python development frameworks.
 
 At the same time, the [Refinitiv Data Platform (RDP) APIs](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) provide various Refinitiv data and content for developers via an easy-to-use Web-based API. The APIs are easy to integrate into any application and platform that supports the HTTP protocol and JSON message format. 
+
+That’s all I have to say about unit testing with pytest.
 
 ## <a id="references"></a>References
 
@@ -163,7 +227,13 @@ That brings me to the end of my unit test example project. For further details, 
 * [Getting Started with Refinitiv Data Platform](https://developers.refinitiv.com/en/article-catalog/article/getting-start-with-refinitiv-data-platform) article.
 * [Python pytest framework official page](https://docs.pytest.org/en/7.2.x/).
 * [Python requests-mock library page](https://requests-mock.readthedocs.io/en/latest/).
+* [pytest-datadir library](https://pypi.org/project/pytest-datadir/) page.
+* [Python Guide: Testing Your Code](https://docs.python-guide.org/writing/tests/) article.
 * [Using pytest - Real Python](https://realpython.com/lessons/using-pytest/) website.
+* [How and when to use Unit Testing properly](https://softwareengineering.stackexchange.com/questions/89064/how-and-when-to-use-unit-testing-properly) post.
+* [13 Tips for Writing Useful Unit Tests](https://betterprogramming.pub/13-tips-for-writing-useful-unit-tests-ca20706b5368) blog post.
+* [pytest document: How to mark test functions with attributes](https://docs.pytest.org/en/7.1.x/how-to/mark.html#how-to-mark-test-functions-with-attributes)
+* [pytest document: Working with custom markers](https://docs.pytest.org/en/7.1.x/example/markers.html#working-with-custom-markers)
 
 For any questions related to Refinitiv Data Platform APIs, please use the [RDP APIs Forum](https://community.developers.refinitiv.com/spaces/231/index.html) on the [Developers Community Q&A page](https://community.developers.refinitiv.com/).
 

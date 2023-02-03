@@ -9,7 +9,7 @@ ALL EXAMPLE CODE IS PROVIDED ON AN “AS IS” AND “AS AVAILABLE” BASIS FOR 
 
 ## <a id="pytest_intro"></a>Introduction to Python Pytest framework
 
-The [pytest](https://docs.pytest.org/en/7.2.x/) is one of the most popular all-purpose Python testing frameworks. This open-source framework lets developers/QAs write small, readable, and scalable test cases that are suitable for both simple function testing and complex applications. Comparing to the bulky class-based unit test framework like Python's built-in [unittest](https://docs.python.org/3.9/library/unittest.html), the pytest framework has an easier learning curve with more flexibility.
+So, I will start off with the pytest introduction. The [pytest](https://docs.pytest.org/en/7.2.x/) (aka py.test) is one of the most popular all-purpose Python testing frameworks. This open-source framework lets developers/QAs write small, readable, and scalable test cases that are suitable for both simple function testing and complex applications. Comparing to the bulky class-based unit test framework like Python's built-in [unittest](https://docs.python.org/3.9/library/unittest.html), the pytest framework has an easier learning curve with more flexibility.
 
 Pytest Features:
 - Use the Python standard [assert statement](https://docs.python.org/3.9/reference/simple_stmts.html#assert) for verifying expectations and values in Python tests, no more ```self.assertXXX``` methods like the unittest
@@ -67,6 +67,8 @@ Please find more detail about the pytest framework from the following resources:
 - [pytest getting started page](https://docs.pytest.org/en/7.2.x/getting-started.html)
 - [Using pytest - Real Python](https://realpython.com/lessons/using-pytest/)
 
+That covers the introduction to pytest framework.
+
 ## <a id="rdp_workflow"></a>RDP APIs Application Workflow
 
 Refinitiv Data Platform entitlement check is based on OAuth 2.0 specification. The first step of an application workflow is to get a token from RDP Auth Service, which will allow access to the protected resource, i.e. data REST API. 
@@ -87,7 +89,7 @@ Next, after the application received the Access Token (and authorization token) 
 
 ## <a id="project_info"></a>Project Structure
 
-This example project is a Python console application that login to the RDP platform, then requests the company's Environmental Social and Governance (ESG) data and meta information from the RDP ESG and Search Explore services respectively. The project structure is as follows:
+That brings us to project structure. This example project is a Python console application that login to the RDP platform, then requests the company's Environmental Social and Governance (ESG) data and meta information from the RDP ESG and Search Explore services respectively. The project structure is as follows:
 
 
 ```
@@ -490,6 +492,8 @@ def test_login_rdp_invalid_clientID(supply_test_config,supply_test_class, supply
 
 With mocking, a test case never needs to send actual request messages to the RDP APIs, so we can test more scenarios for other RDP services too.
 
+That covers some of the basic RDP authentication methods testing.
+
 ## <a id="rdp_get_data"></a>Unit Testing for RDP APIs Data Request
 
 That brings us to requesting the RDP APIs data. All subsequent REST API calls use the Access Token via the *Authorization* HTTP request message header as shown below to get the data. 
@@ -547,7 +551,7 @@ The ```rdp_request_search_explore()``` method above just create the request mess
 
 ### <a id="unittest_rdp_esg_success"></a>Testing a valid RDP Search Explore Request-Response
 
-The first test case is the request success scenario. I will begin by creating a test-content file with a valid Search Explore response message. A file is *rdp_test_esg_fixture.json* in a *tests/data* folder.
+The first test case is the request data success scenario. I will begin by creating a test-content file with a valid Search Explore response message. A file is *rdp_test_esg_fixture.json* in a *tests/data* folder.
 
 ``` JSON
 {
@@ -864,3 +868,24 @@ That’s all I have to say about unit testing the Python HTTP code with Requests
 ## <a id="how_to_run"></a>How to run the example test suite
 
 Please see how to run the project test suit in the [README.md](README.md#how_to_run) file.
+
+## <a id="references"></a>References
+
+For further details, please check out the following resources:
+* [Refinitiv Data Platform APIs page](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) on the [Refinitiv Developer Community](https://developers.refinitiv.com/) website.
+* [Refinitiv Data Platform APIs Playground page](https://api.refinitiv.com).
+* [Refinitiv Data Platform APIs: Introduction to the Request-Response API](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/tutorials#introduction-to-the-request-response-api).
+* [Refinitiv Data Platform APIs: Authorization - All about tokens](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/tutorials#authorization-all-about-tokens).
+* [Limitations and Guidelines for the RDP Authentication Service](https://developers.refinitiv.com/en/article-catalog/article/limitations-and-guidelines-for-the-rdp-authentication-service) article.
+* [Getting Started with Refinitiv Data Platform](https://developers.refinitiv.com/en/article-catalog/article/getting-start-with-refinitiv-data-platform) article.
+* [Python pytest framework official page](https://docs.pytest.org/en/7.2.x/).
+* [Python requests-mock library page](https://requests-mock.readthedocs.io/en/latest/).
+* [pytest-datadir library](https://pypi.org/project/pytest-datadir/) page.
+* [Python Guide: Testing Your Code](https://docs.python-guide.org/writing/tests/) article.
+* [Using pytest - Real Python](https://realpython.com/lessons/using-pytest/) website.
+* [How and when to use Unit Testing properly](https://softwareengineering.stackexchange.com/questions/89064/how-and-when-to-use-unit-testing-properly) post.
+* [13 Tips for Writing Useful Unit Tests](https://betterprogramming.pub/13-tips-for-writing-useful-unit-tests-ca20706b5368) blog post.
+* [pytest document: How to mark test functions with attributes](https://docs.pytest.org/en/7.1.x/how-to/mark.html#how-to-mark-test-functions-with-attributes)
+* [pytest document: Working with custom markers](https://docs.pytest.org/en/7.1.x/example/markers.html#working-with-custom-markers)
+
+For any questions related to Refinitiv Data Platform APIs, please use the [RDP APIs Forum](https://community.developers.refinitiv.com/spaces/231/index.html) on the [Developers Community Q&A page](https://community.developers.refinitiv.com/).
