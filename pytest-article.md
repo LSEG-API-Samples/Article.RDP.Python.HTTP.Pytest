@@ -540,7 +540,7 @@ def rdp_request_search_explore(self, search_url, access_token, payload):
     return response.json()
 ```
 
-The ```rdp_request_search_explore()``` method above just create the request message payload, and send it to the RDP Search Explore service as HTTP POST request with the Requests ```requests.post()``` method. The return values can be as follows
+The ```rdp_request_search_explore()``` method above just create the request message payload, and send it to the RDP Search Explore service as an HTTP POST request with the Requests ```requests.post()``` method. The return values can be as follows
 - If the request success (HTTP status is 200), returns the response data in JSON message format.
 - If the URL or access token, or universe values are empty or none, raise the TypeError exception to the caller.
 - If the request fails, raise the Requests' HTTPError exception to the caller with HTTP status response information.
@@ -588,7 +588,7 @@ The first test case is the request success scenario. I will begin by creating a 
 }
 ```
 
-We are not going to load this data into *conftest.py* fixture because only one test case uses this dummy data. We are using it as a test data resource with the [pytest-datadir](https://pypi.org/project/pytest-datadir/) library. The pytest-datadir will copy the original file to a temporary folder, so changing the file contents won't change the original data file and the test case can use it in the test assertions.
+We are not going to load this data into the *conftest.py* fixture because only one test case uses this dummy data. We are using it as a test data resource with the [pytest-datadir](https://pypi.org/project/pytest-datadir/) library. The pytest-datadir will copy the original file to a temporary folder, so changing the file contents won't change the original data file and the test case can use it in the test assertions.
 
 However, the RDP Search request message will be reused by multiple test cases as a based line for each test's request message payload, so we add it as a new ```search_explore_payload``` content to a *supply_test_mock_json* fixture method as follows.
 
@@ -751,19 +751,19 @@ def test_request_search_explore_token_expire(supply_test_config,supply_test_clas
 
 ```
 
-The other common RDP APIs failure scenario is the application sends the request message to RDP without the access token in the HTTP request header. However, the *access token* is one of the ```rdp_request_search_explore()``` method required parameters. If the access token is not presented (None or Empty), the method raises the TypeError exception and does not send an HTTP request message to the RDP. The ```test_request_search_explore_none_empty()``` method is the one that covers this test case. There is also a ```test_request_search_explore_invalid_json()``` test case method in the file that demonstrates how to test invalid JSON request message scenario.
+The other common RDP APIs failure scenario is the application sends the request message to RDP without the access token in the HTTP request header. However, the *access token* is one of the ```rdp_request_search_explore()``` method required parameters. If the access token is not presented (None or Empty), the method raises the TypeError exception and does not send an HTTP request message to the RDP. The ```test_request_search_explore_none_empty()``` method is the one that covers this test case. There is also a ```test_request_search_explore_invalid_json()``` test case method in the file that demonstrates how to test an invalid JSON request message scenario.
 
-That covers the Discovery Search Explore service test cases. If you are interested in RDP ESG service test cases, please check the ```test_request_esg_xxx``` methods which have the same testing and mocking logic as all previous cases that I have mentions above.
+That covers the Discovery Search Explore service test cases. If you are interested in RDP ESG service test cases, please check the ```test_request_esg_xxx``` methods which have the same testing and mocking logic as all previous cases that I have mentioned above.
 
 ### <a id="pytest_mark"></a>Bonus: Pytest Markers
 
-Now we come to one of the most unique features of pytest, the *markers*. The pytest framework supports test case metadata setting known as *markers* (```pytest.mark```). The markers are used by plugins, and are commonly used to run or skip tests with specific marker. Here are some of the builtin markers:
+Now we come to one of the most unique features of pytest, the *markers*. The pytest framework supports test case metadata settings known as *markers* (```pytest.mark```). The markers are used by plugins and are commonly used to run or skip tests with specific markers. Here are some of the builtin markers:
 - *skip*: always skip a test function
 - *skipif* - skip a test function if a certain condition is met
 - *xfail* - produce an “expected failure” outcome if a certain condition is met
 - *parametrize* - perform multiple calls to the same test function.
 
-The framework also supports [custom markers](https://docs.pytest.org/en/7.1.x/example/markers.html#working-with-custom-markers) to match the project's requirement too. Once the custom markers has been set, developers can run ```pytest -m <mark>``` for run test specific tests.
+The framework also supports [custom markers](https://docs.pytest.org/en/7.1.x/example/markers.html#working-with-custom-markers) to match the project's requirement too. Once the custom markers have been set, developers can run ```pytest -m <mark>```to run test-specific tests.
 
 To create custom markers, the first thing you need to do is define your markers for grouping test cases in the ```pytest.ini``` configuration file as follows:
 
@@ -815,9 +815,9 @@ def test_request_search_explore_none_empty(supply_test_class,supply_test_mock_js
     ...
 ```
 
-Please be noticed that you can set multiple markers to each test method. 
+Please be noticed that you can set multiple markers for each test method. 
 
-In order to run specific markers, you can run pytest with ```-m <mark>``` command as follows:
+To run specific markers, you can run pytest with ```-m <mark>``` command as follows:
 
 Example: Run only success scenarios test cases:
 
@@ -837,7 +837,7 @@ test_rdp_http_controller.py::test_request_search_explore PASSED                 
 
 =============================================== 4 passed, 12 deselected in 0.18s ================================================ 
 ```
-You can select multiple markers with ```and``` , ```or```, ```not``` operators to combine multiple markers. The following example shows how to specify only RDP ESG service unsuccess test cases.
+You can select multiple markers with ```and```, ```or```, ```not``` operators to combine multiple markers. The following example shows how to specify only RDP ESG service unsuccess test cases.
 
 ``` Bash
 (rdp_pytest) C:\rdp_python_pytest\test>pytest -m "not test_valid and test_esg" -v 
