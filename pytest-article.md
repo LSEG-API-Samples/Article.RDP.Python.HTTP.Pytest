@@ -132,7 +132,7 @@ It loads the test configurations such as the RDP APIs URLs from a ```.env.test``
 
 Let's start with setting up the test configurations, resources, and environment variables. This project keeps the test configurations such as mock RDP credentials, and API URLs in a ```${project root}/.env.test``` environment variables file. And then uses the [pytest-dotenv](https://pypi.org/project/pytest-dotenv/) plugin to the ```os.environ``` variable without hardcoded path reference to the file.
 
-To load a custom environment variables into pytest, we create a pytest configuration file named ```pytest.ini``` at the root of ```tests``` folder to specify where the ```env_var``` is and overriding any variables already defined in the process' environment.
+To load a custom environment variables into pytest, we create a pytest configuration file named ```pytest.ini``` at the root of project folder to specify where the ```env_var``` is and overriding any variables already defined in the process' environment.
 
 ``` ini
 [pytest]
