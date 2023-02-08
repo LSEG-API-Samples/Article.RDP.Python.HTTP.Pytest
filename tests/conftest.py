@@ -15,7 +15,6 @@ import sys
 import os
 
 sys.path.append('..')
-#from dotenv import dotenv_values
 
 from rdp_controller import rdp_http_controller
 from app import convert_pandas
@@ -23,8 +22,9 @@ from app import convert_pandas
 # Supply test environment variables
 @pytest.fixture(scope='class')
 def supply_test_config():
-    #config = { **os.environ }
-    return os.environ
+    config = { **os.environ }
+    #config = { **dotenv_values("../.env.test") }
+    return config
 
 # Supply test RDPHTTPController class
 @pytest.fixture(scope='class')

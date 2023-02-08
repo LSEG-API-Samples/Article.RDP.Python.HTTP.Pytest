@@ -38,7 +38,7 @@ def test_login_rdp_success(supply_test_config,supply_test_class, supply_test_moc
         status_code = 200,
         headers = {'Content-Type':'application/json'}
         )
-
+    
     # Calling RDPHTTPController rdp_authentication() method
     access_token, refresh_token, expires_in = app.rdp_authentication(auth_endpoint, username, password, client_id)
     assert access_token is not None, "access token is None, success RDP Authentication returns invalid data"

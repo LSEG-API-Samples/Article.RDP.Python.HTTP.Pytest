@@ -94,12 +94,9 @@ That brings us to project structure. This example project is a Python console ap
 
 ```
 .
-├── .env
 ├── .env.test
-├── LICENSE.md
-├── README.md
 ├── app.py
-├── pytest-article.md
+├── pytest.ini
 ├── rdp_controller
 │   ├── __init__.py
 │   └── rdp_http_controller.py
@@ -113,22 +110,21 @@ That brings us to project structure. This example project is a Python console ap
     │   ├── test_esg_invalid_fixture.json
     │   ├── test_search_fixture.json
     │   └── test_search_invalid_fixture.json
-    ├── pytest.ini
     ├── test_app.py
     └── test_rdp_http_controller.py
 ```
 
-*Note*: The Docker and git-related files are not shown in the project structure above. 
+*Note*: The README, Docker, and git-related files are not shown in the project structure above. 
 
 * app.py: The main console application.
+* pytest.ini: The pytest settings configuration file.
 * rdp_controller/rdp_http_controller.py: The main HTTP operations class. This is our focus class for unit testing.
 * tests/conftest.py: The root file that provides fixtures for all test cases in the ```tests``` folder.
-* tests/pytest.ini: The pytest settings configuration file.
 * tests/test_rdp_http_controller.py: The main test cases file that tests all rdp_http_controller.py class's methods. This is our focus test suite in this project.
 * tests/test_app.py: The test suite class that tests some app.py methods.
 * tests/data: The test suite resource files.
 
-### <a id="pytest_set_Env"></a>Setting Unit Test Environment
+## <a id="pytest_set_Env"></a>Setting Unit Test Environment
 
 Let’s start with the class that operates HTTP request-response messages with the RDP services.
 
@@ -141,9 +137,11 @@ To load a custom environment variables into pytest, we create a pytest configura
 ``` ini
 [pytest]
 env_override_existing_values = 1
-env_files = ../.env.test
+env_files = .env.test
 ```
-*Note*: This plugin uses the [python-dotenv](https://pypi.org/project/python-dotenv/) under the hood, so the python-dotenv dependency will be installed too.
+*Note*: 
+- This plugin uses the [python-dotenv](https://pypi.org/project/python-dotenv/) under the hood, so the python-dotenv dependency will be installed too.
+- If you have a ```.env``` file in the same folder, somehow the plugin always loads ```.env``` file content instead even if you did not specify it. I am workaround this issue by using a ```.env.run``` file name for running the application.
 
 This ```os.environ``` environment variables and the ```RDPHTTPController``` class will be used in almost every test case, so we set them as a *fixtures*. The fixture can be are data, class, preconditions states, context, or resources needed to run a test. Unlike the unittest framework,the [pytest fixture](https://docs.pytest.org/en/6.2.x/fixture.html) is in a functional form that can be used in a modular manner.
 
@@ -163,7 +161,8 @@ from rdp_controller import rdp_http_controller
 # Supply test environment variables
 @pytest.fixture(scope='class')
 def supply_test_config():
-    return os.environ
+    config = { **os.environ }
+    return  config
 
 # Supply test RDPHTTPController class
 @pytest.fixture(scope='class')
@@ -176,7 +175,7 @@ You may be noticed the ````scope='class'``` in the ```@pytest.fixture(scope='cla
 
 That is all for the fixture preparation.
 
-### <a id="pytest_rdp_authen"></a>Unit Testing RDP APIs Authentication with Pytest
+## <a id="pytest_rdp_authen"></a>Unit Testing RDP APIs Authentication with Pytest
 
 Moving on to the next topic, the class that operates HTTP request-response messages with the RDP services. The ```rdp_controller/rdp_http_controller.py``` class uses the Requests library to send and receive data with the RDP HTTP REST APIs. The code for the RDP authentication is shown below.
 
@@ -411,7 +410,7 @@ def test_login_rdp_success(supply_test_config,supply_test_class, supply_test_moc
 ```
 The code above set a Responses mock object with the *https://api.refinitiv.com/auth/oauth2/v1/token* URL and HTTP *POST* method. The requests-mock library then returns a ```valid_auth_json``` JSON message with HTTP status *200* and Content-Type *application/json* from the ```supply_test_mock_json``` fixture to the application for all HTTP *POST* request messages to *https://api.refinitiv.com/auth/oauth2/v1/token* URL without any network operations between the machine and the actual RDP endpoint.
 
-### <a id="unittest_rdp_authen_fail"></a>Testing Invalid RDP Client ID Authentication Request-Response
+## <a id="unittest_rdp_authen_fail"></a>Testing Invalid RDP Client ID Authentication Request-Response
 
 This mock object is also useful for testing false cases such as invalid login too.  The ```test_login_rdp_invalid()``` method is a test case for the RDP Authentication login failure scenario. I am starting by add a new ```invalid_clientid_auth_json``` dummy content of the RDP invalid ClientID log response to a *supply_test_mock_json* fixture method.
 
@@ -759,7 +758,7 @@ The other common RDP APIs failure scenario is the application sends the request 
 
 That covers the Discovery Search Explore service test cases. If you are interested in RDP ESG service test cases, please check the ```test_request_esg_xxx``` methods which have the same testing and mocking logic as all previous cases that I have mentioned above.
 
-### <a id="pytest_mark"></a>Bonus: Pytest Markers
+## <a id="pytest_mark"></a>Bonus: Pytest Markers
 
 Now we come to one of the most unique features of pytest, the *markers*. The pytest framework supports test case metadata settings known as *markers* (```pytest.mark```). The markers are used by plugins and are commonly used to run or skip tests with specific markers. Here are some of the builtin markers:
 - *skip*: always skip a test function
@@ -769,7 +768,7 @@ Now we come to one of the most unique features of pytest, the *markers*. The pyt
 
 The framework also supports [custom markers](https://docs.pytest.org/en/7.1.x/example/markers.html#working-with-custom-markers) to match the project's requirement too. Once the custom markers have been set, developers can run ```pytest -m <mark>```to run test-specific tests.
 
-To create custom markers, the first thing you need to do is define your markers for grouping test cases in the ```pytest.ini``` configuration file as follows:
+To create custom markers, the first thing you need to do is define your markers for grouping test cases in the ```pytest.ini``` configuration file at the root project as follows:
 
 ``` INI
 [pytest]
@@ -780,7 +779,7 @@ markers =
     test_valid: marks valid methods call test
     empty_case: marks for None/Empty param methods call test
 env_override_existing_values = 1
-env_files = ../.env.test
+env_files = .env.test
 ```
 Then, add the marker to test methods in ```test_rdp_http_controller.py``` file with ```@pytest.mark.<custom mark>``` decorator. Please see the example modified code below.
 
