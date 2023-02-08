@@ -7,3 +7,4 @@ rdp_controller/__pycache__/
 __pycache__/
 note.txt
 .env.run
+.env.development

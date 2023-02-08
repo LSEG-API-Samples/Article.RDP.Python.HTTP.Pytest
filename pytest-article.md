@@ -141,7 +141,7 @@ env_files = .env.test
 ```
 *Note*: 
 - This plugin uses the [python-dotenv](https://pypi.org/project/python-dotenv/) under the hood, so the python-dotenv dependency will be installed too.
-- If you have a ```.env``` file in the same folder, somehow the plugin always loads ```.env``` file content instead even if you did not specify it. I am workaround this issue by using a ```.env.run``` file name for running the application.
+- If you have a ```.env``` file in the same folder, somehow the plugin always loads ```.env``` file content instead even if you did not specify it. I am workaround this issue by using a ```.env.development``` file name for running the application.
 
 This ```os.environ``` environment variables and the ```RDPHTTPController``` class will be used in almost every test case, so we set them as a *fixtures*. The fixture can be are data, class, preconditions states, context, or resources needed to run a test. Unlike the unittest framework,the [pytest fixture](https://docs.pytest.org/en/6.2.x/fixture.html) is in a functional form that can be used in a modular manner.
 
