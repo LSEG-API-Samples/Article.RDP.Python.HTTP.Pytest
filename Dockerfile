@@ -25,7 +25,7 @@ ENV PATH=/root/.local:$PATH \
 # copy only the dependencies installation from the 1st stage image
 COPY --from=builder /root/.local /root/.local
 # Copy env.test, module and tests folder.
-COPY app.py .env.test ./
+COPY app.py .env.test pytest.ini ./
 ADD rdp_controller /app/rdp_controller
 ADD tests /app/tests
 WORKDIR /app/tests
