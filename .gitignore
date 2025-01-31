@@ -8,3 +8,6 @@ __pycache__/
 note.txt
 .env.run
 .env.development
+testenv/
+pytestenv/
+runenv/

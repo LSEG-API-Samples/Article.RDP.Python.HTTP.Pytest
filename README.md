@@ -1,11 +1,11 @@
 # Getting Start Unit Test with Pytest for an HTTP REST Python Application
-- version: 1.0
-- Last update: Feb 2023
+- version: 2.0
+- Last update: January 2025
 - Environment: Windows
 - Prerequisite: [Access to RDP credentials](#prerequisite)
 
 Example Code Disclaimer:
-ALL EXAMPLE CODE IS PROVIDED ON AN “AS IS” AND “AS AVAILABLE” BASIS FOR ILLUSTRATIVE PURPOSES ONLY. REFINITIV MAKES NO REPRESENTATIONS OR WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, AS TO THE OPERATION OF THE EXAMPLE CODE, OR THE INFORMATION, CONTENT, OR MATERIALS USED IN CONNECTION WITH THE EXAMPLE CODE. YOU EXPRESSLY AGREE THAT YOUR USE OF THE EXAMPLE CODE IS AT YOUR SOLE RISK.
+ALL EXAMPLE CODE IS PROVIDED ON AN “AS IS” AND “AS AVAILABLE” BASIS FOR ILLUSTRATIVE PURPOSES ONLY. LSEG MAKES NO REPRESENTATIONS OR WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, AS TO THE OPERATION OF THE EXAMPLE CODE, OR THE INFORMATION, CONTENT, OR MATERIALS USED IN CONNECTION WITH THE EXAMPLE CODE. YOU EXPRESSLY AGREE THAT YOUR USE OF THE EXAMPLE CODE IS AT YOUR SOLE RISK.
 
 ## <a id="intro"></a>Introduction
 
@@ -15,7 +15,7 @@ Unit testing is a software testing method that helps developers verify if any ch
 
 Modern applications also need to connect to other services like APIs, databases, data storage, etc. The unit testing needs to cover those modules too. This example project shows how to run unit test cases for a [Python](https://www.python.org/) application that performs HTTP REST operations which is the most basic task of today's application functionality. With unit testing, developers can verify if their code can connect and consume content via HTTP REST API in any code updates. 
 
-The example project is a part two of the [Getting Start Unit Test for an HTTP REST Application with Python](https://github.com/Refinitiv-API-Samples/Article.RDP.Python.HTTP.UnitTest) project. The first project uses the Python built-in [unittest](https://docs.python.org/3.9/library/unittest.html) as a test framework. This project uses more popular [pytest](https://docs.pytest.org/en/7.2.x/) as a test framework. The target application source code for testing remain the same, it uses a de-facto [Requests](https://requests.readthedocs.io/en/latest/) library to connect to the [Refinitiv Data Platform (RDP) APIs](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) as the example HTTP REST APIs.
+The example project is a part two of the [Getting Start Unit Test for an HTTP REST Application with Python](https://github.com/LSEG-API-Samples/Article.RDP.Python.HTTP.UnitTest) project. The first project uses the Python built-in [unittest](https://docs.python.org/3.9/library/unittest.html) as a test framework. This project uses more popular [pytest](https://docs.pytest.org/en/7.2.x/) as a test framework. The target application source code for testing remain the same, it uses a de-facto [Requests](https://requests.readthedocs.io/en/latest/) library to connect to the [Delivery Platform (RDP) APIs](https://developers.lseg.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) as the example HTTP REST APIs.
 
 **Note**:
 This demo project is not cover all test cases for the HTTP operations and all RDP APIs services. It aims to give the readers an idea about how to unit test an application that makes an HTTP connection with Python only. 
@@ -88,11 +88,11 @@ Please find more detail about the pytest framework from the following resources:
 
 Let’s leave the pytest framework overview there.
 
-## <a id="whatis_rdp"></a>What is Refinitiv Data Platform (RDP) APIs?
+## <a id="whatis_rdp"></a>What is Delivery Data Platform (RDP) APIs?
 
-Now let me turn to our example HTTP API for this project. The [Refinitiv Data Platform (RDP) APIs](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) provide various Refinitiv data and content for developers via easy-to-use Web-based API.
+Now let me turn to our example HTTP API for this project. The [Data Platform (RDP) APIs](https://developers.lseg.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) (formerly known as Refinitiv Data Platform) provide various LSEG data and content for developers via easy-to-use Web-based API.
 
-RDP APIs give developers seamless and holistic access to all of the Refinitiv content such as Environmental Social and Governance (ESG), News, Research, etc, and commingled with their content, enriching, integrating, and distributing the data through a single interface, delivered wherever they need it.  The RDP APIs delivery mechanisms are the following:
+RDP APIs give developers seamless and holistic access to all of the LSEG content such as Environmental Social and Governance (ESG), News, Research, etc, and commingled with their content, enriching, integrating, and distributing the data through a single interface, delivered wherever they need it.  The RDP APIs delivery mechanisms are the following:
 * Request - Response: RESTful web service (HTTP GET, POST, PUT or DELETE) 
 * Alert: delivery is a mechanism to receive asynchronous updates (alerts) to a subscription. 
 * Bulks:  deliver substantial payloads, like the end-of-day pricing data for the whole venue. 
@@ -100,11 +100,11 @@ RDP APIs give developers seamless and holistic access to all of the Refinitiv co
 
 This example project is focusing on the Request-Response: RESTful web service delivery method only.  
 
-![figure-2](images/02_rdp.png "Refinitiv Data Platform")
+![figure-2](images/02_rdp.png "Data Platform")
 
-For more detail regarding the Refinitiv Data Platform, please see the following APIs resources: 
-- [Quick Start](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/quick-start) page.
-- [Tutorials](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/tutorials) page.
+For more detail regarding the RDP APIs, please see the following APIs resources: 
+- [Quick Start](https://developers.lseg.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/quick-start) page.
+- [Tutorials](https://developers.lseg.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/tutorials) page.
 
 ## <a id="testsuite_detail"></a>Test Suit Development Detail
 
@@ -118,7 +118,7 @@ This demo project requires the following dependencies.
 2. Python [Anaconda](https://www.anaconda.com/distribution/) or [MiniConda](https://docs.conda.io/en/latest/miniconda.html) distribution/package manager.
 3. Internet connection.
 
-Please contact your Refinitiv representative to help you to access the RDP account and services. You can find more detail regarding the RDP access credentials set up from the lease see the *Getting Started for User ID* section of the [Getting Start with Refinitiv Data Platform](https://developers.refinitiv.com/en/article-catalog/article/getting-start-with-refinitiv-data-platform) article.
+Please contact your LSEG representative to help you to access the RDP account and services. You can find more detail regarding the RDP access credentials set up from the lease see the *Getting Started for User ID* section of the [Getting Start with Data Platform](https://developers.lseg.com/en/article-catalog/article/getting-start-with-refinitiv-data-platform) article.
 
 ## <a id="how_to_run"></a>How to run the example test suite
 
@@ -196,7 +196,7 @@ test_rdp_http_controller.py ............                                        
 ================================================ 15 passed in 0.17s =================================================
 ```
 
-![figure-3](images/03_pytest_run_1.gif "Refinitiv Data Platform")
+![figure-3](images/03_pytest_run_1.gif "Data Platform")
 
 Alternatively, you can use [VS Code Python testing tool](https://code.visualstudio.com/docs/python/testing#_configure-tests) to run test cases too. The ```.vscode``` project setting is included with the project.
 
@@ -212,31 +212,28 @@ This example project demonstrates the manual unit testing method. However, devel
 
 The [pytest](https://docs.pytest.org/en/7.2.x/) test framework and [requests-mock](https://pypi.org/project/requests-mock/) mocking library are other good choices to learn a unit testing with [Python](https://www.python.org/) and HTTP REST application. They are easy to learn, provide powerful but simple to use features for developers, and also supports a lot of plugins and Python development frameworks.
 
-At the same time, the [Refinitiv Data Platform (RDP) APIs](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) provide various Refinitiv data and content for developers via an easy-to-use Web-based API. The APIs are easy to integrate into any application and platform that supports the HTTP protocol and JSON message format. 
+At the same time, the [RDP APIs](https://developers.lseg.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) provide various LSEG data and content for developers via an easy-to-use Web-based API. The APIs are easy to integrate into any application and platform that supports the HTTP protocol and JSON message format. 
 
 That’s all I have to say about unit testing with pytest.
 
 ## <a id="references"></a>References
 
 That brings me to the end of my unit test example project. For further details, please check out the following resources:
-* [Refinitiv Data Platform APIs page](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) on the [Refinitiv Developer Community](https://developers.refinitiv.com/) website.
-* [Refinitiv Data Platform APIs Playground page](https://api.refinitiv.com).
-* [Refinitiv Data Platform APIs: Introduction to the Request-Response API](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/tutorials#introduction-to-the-request-response-api).
-* [Refinitiv Data Platform APIs: Authorization - All about tokens](https://developers.refinitiv.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/tutorials#authorization-all-about-tokens).
-* [Limitations and Guidelines for the RDP Authentication Service](https://developers.refinitiv.com/en/article-catalog/article/limitations-and-guidelines-for-the-rdp-authentication-service) article.
-* [Getting Started with Refinitiv Data Platform](https://developers.refinitiv.com/en/article-catalog/article/getting-start-with-refinitiv-data-platform) article.
-* [Python pytest framework official page](https://docs.pytest.org/en/7.2.x/).
-* [Python requests-mock library page](https://requests-mock.readthedocs.io/en/latest/).
-* [pytest-datadir library](https://pypi.org/project/pytest-datadir/) page.
-* [Python Guide: Testing Your Code](https://docs.python-guide.org/writing/tests/) article.
-* [Using pytest - Real Python](https://realpython.com/lessons/using-pytest/) website.
-* [How and when to use Unit Testing properly](https://softwareengineering.stackexchange.com/questions/89064/how-and-when-to-use-unit-testing-properly) post.
-* [13 Tips for Writing Useful Unit Tests](https://betterprogramming.pub/13-tips-for-writing-useful-unit-tests-ca20706b5368) blog post.
-* [pytest document: How to mark test functions with attributes](https://docs.pytest.org/en/7.1.x/how-to/mark.html#how-to-mark-test-functions-with-attributes)
-* [pytest document: Working with custom markers](https://docs.pytest.org/en/7.1.x/example/markers.html#working-with-custom-markers)
 
-For any questions related to Refinitiv Data Platform APIs, please use the [RDP APIs Forum](https://community.developers.refinitiv.com/spaces/231/index.html) on the [Developers Community Q&A page](https://community.developers.refinitiv.com/).
+- [RDP APIs page](https://developers.lseg.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis) on the [LSEG Developer Community](https://developers.lseg.com/) website.
+- [RDP APIs Playground page](https://apidocs.refinitiv.com/Apps/ApiDocs).
+- [RDP APIs: Introduction to the Request-Response API](https://developers.lseg.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/tutorials#introduction-to-the-request-response-api).
+- [RDP APIs: Authorization - All about tokens](https://developers.lseg.com/en/api-catalog/refinitiv-data-platform/refinitiv-data-platform-apis/tutorials#authorization-all-about-tokens).
+- [Limitations and Guidelines for the RDP Authentication Service](https://developers.lseg.com/en/article-catalog/article/limitations-and-guidelines-for-the-rdp-authentication-service) article.
+- [Getting Started with Data Platform](https://developers.lseg.com/en/article-catalog/article/getting-start-with-refinitiv-data-platform) article.
+- [Python pytest framework official page](https://docs.pytest.org/en/7.2.x/).
+- [Python requests-mock library page](https://requests-mock.readthedocs.io/en/latest/).
+- [pytest-datadir library](https://pypi.org/project/pytest-datadir/) page.
+- [Python Guide: Testing Your Code](https://docs.python-guide.org/writing/tests/) article.
+- [Using pytest - Real Python](https://realpython.com/lessons/using-pytest/) website.
+- [How and when to use Unit Testing properly](https://softwareengineering.stackexchange.com/questions/89064/how-and-when-to-use-unit-testing-properly) post.
+- [13 Tips for Writing Useful Unit Tests](https://betterprogramming.pub/13-tips-for-writing-useful-unit-tests-ca20706b5368) blog post.
+- [pytest document: How to mark test functions with attributes](https://docs.pytest.org/en/7.1.x/how-to/mark.html#how-to-mark-test-functions-with-attributes)
+- [pytest document: Working with custom markers](https://docs.pytest.org/en/7.1.x/example/markers.html#working-with-custom-markers)
 
-## Developers Articles
-
-TBD.
+For any questions related to the RDP APIs, please use the [Developers Community Q&A page](https://community.developers.refinitiv.com/).
