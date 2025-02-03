@@ -2,7 +2,7 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.202.5/containers/
 {
 	"name": "Python RDP Pytest project",
-	"image": "python:3.9.16-slim-bullseye",
+	"image": "python:3.11-slim-bookworm",
 	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
 	"workspaceFolder": "/workspace",
 	"postCreateCommand": "pip install -r requirements_test.txt",
