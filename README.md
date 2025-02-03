@@ -129,7 +129,7 @@ The first step is to unzip or download the example project folder into a directo
 1. Open a Command Prompt and go to the project's folder.
 2. RRun the following command in the Command Prompt application to create a Python Virtual environment named *rdp_pytest* for the project.
     ``` bash
-    $>python -m venvrdp_pytest
+    $>python -m venv rdp_pytest
     ```
 3. Once the environment is created, activate a virtual environment *rdp_pytest* environment with this command.
     ``` bash
