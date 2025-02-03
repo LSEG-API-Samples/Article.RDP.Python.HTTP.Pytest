@@ -115,7 +115,7 @@ Please see the full details over the test suite implementation on the [pytest-ar
 This demo project requires the following dependencies.
 
 1. RDP Access credentials.
-2. Python [Anaconda](https://www.anaconda.com/distribution/) or [MiniConda](https://docs.conda.io/en/latest/miniconda.html) distribution/package manager.
+2. [Python](https://www.python.org/) 3.10 and above
 3. Internet connection.
 
 Please contact your LSEG representative to help you to access the RDP account and services. You can find more detail regarding the RDP access credentials set up from the lease see the *Getting Started for User ID* section of the [Getting Start with Data Platform](https://developers.lseg.com/en/article-catalog/article/getting-start-with-refinitiv-data-platform) article.
@@ -126,14 +126,14 @@ The first step is to unzip or download the example project folder into a directo
 
 ### <a id="python_example_run"></a>Run example test suite in a console
 
-1. Open Anaconda Prompt and go to the project's folder.
-2. Run the following command in the Anaconda Prompt application to create a Conda environment named *rdp_pytest* for the project.
+1. Open a Command Prompt and go to the project's folder.
+2. RRun the following command in the Command Prompt application to create a Python Virtual environment named *rdp_pytest* for the project.
     ``` bash
-    (base) $>conda create --name rdp_pytest python=3.9
+    $>python -m venvrdp_pytest
     ```
-3. Once the environment is created, activate a Conda *rdp_pytest* environment with this command in Anaconda Prompt.
+3. Once the environment is created, activate a virtual environment *rdp_pytest* environment with this command.
     ``` bash
-    (base) $>conda activate rdp_pytest
+    $>rdp_pytest\Scripts\activate
     ```
 4. Run the following command to the test dependencies (```requirements_test.txt```) in the *rdp_pytest* environment 
     ``` bash
